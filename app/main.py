@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="9git-backend API",
     description="9git-backend API",
-    version="0.1.0",
+    version="0.0.1",
     debug=settings.DB_ECHO_LOG,
     lifespan=lifespan,
 )
