@@ -53,10 +53,10 @@ class UserCharacter(Base):
     __tablename__ = "user_character"
 
     user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     character_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("character.character_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("character.id"), nullable=False
     )
     # UserCharacter → User (N:1 관계)
     user: Mapped["User"] = relationship(
@@ -72,9 +72,6 @@ class UserCharacter(Base):
 class Character(Base):
     __tablename__ = "character"
 
-    character_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4
-    )
     level: Mapped[int] = mapped_column(Integer, nullable=False)
     image_link: Mapped[str] = mapped_column(String(255), nullable=False)
 

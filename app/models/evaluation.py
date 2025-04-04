@@ -1,6 +1,6 @@
 from sqlalchemy import String, Text, Integer, DECIMAL, ForeignKey, DateTime, CHAR, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from uuid import uuid4
+from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from .base import Base
 from .user import User
@@ -12,7 +12,7 @@ class RecommendedChallenge(Base):
     __tablename__ = "recommended_challenge"
 
     user_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     category_name: Mapped[str] = mapped_column(String(100), nullable=False)
     progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
@@ -31,11 +31,8 @@ class RecommendedChallenge(Base):
 class ComprehensiveEvaluations(Base):
     __tablename__ = "comprehensive_evaluations"
 
-    evaluation_id: Mapped[str] = mapped_column(
-        CHAR(36), primary_key=True, default=lambda: str(uuid4())
-    )
     user_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), nullable=False
@@ -50,7 +47,7 @@ class ComprehensiveEvaluations(Base):
         String(100), ForeignKey("category_progress.category_name"), nullable=False
     )
     monthly_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("monthly_achievements.monthly_id"), nullable=True
+        UUID(as_uuid=True), ForeignKey("monthly_achievements.id"), nullable=True
     )
     improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
     improvement_text: Mapped[str] = mapped_column(Text, nullable=True)
@@ -73,11 +70,8 @@ class ComprehensiveEvaluations(Base):
 class MonthlyAchievements(Base):
     __tablename__ = "monthly_achievements"
 
-    monthly_id: Mapped[str] = mapped_column(
-        CHAR(36), primary_key=True, default=lambda: str(uuid4())
-    )
     user_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     category_name: Mapped[str] = mapped_column(
         String(100), ForeignKey("category_progress.category_name"), nullable=False

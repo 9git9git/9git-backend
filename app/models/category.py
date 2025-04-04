@@ -9,7 +9,7 @@ from sqlalchemy import (
     DateTime,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from uuid import uuid4
+from uuid import UUID, uuid4
 from .base import Base
 from .evaluation import ComprehensiveEvaluations
 
@@ -19,7 +19,7 @@ class CategoryProgress(Base):
     __tablename__ = "category_progress"
 
     user_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     category_name: Mapped[str] = mapped_column(
         String(100), primary_key=True
@@ -45,7 +45,7 @@ class Goals(Base):
     __tablename__ = "goals"
 
     user_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     category_name: Mapped[str] = mapped_column(
         String(100), ForeignKey("category_progress.category_name"), nullable=False
@@ -67,7 +67,7 @@ class TodayNotes(Base):
     __tablename__ = "today_notes"
 
     user_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     category_name: Mapped[str] = mapped_column(
         String(100), ForeignKey("category_progress.category_name"), nullable=False

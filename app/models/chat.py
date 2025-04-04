@@ -1,6 +1,6 @@
 from sqlalchemy import String, Text, Integer, Enum, ForeignKey, DateTime, CHAR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from uuid import uuid4
+from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from .base import Base  # ✅ 공통적인 Base 클래스 임포트
 from .user import User
@@ -11,27 +11,19 @@ class Chats(Base):
     __tablename__ = "chats"
 
     user_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     storage_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("storages.storage_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("storages.id"), nullable=False
     )
     function_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("functions.function_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
     )
     category_name: Mapped[str] = mapped_column(String(100), nullable=False)
     role: Mapped[str] = mapped_column(
         Enum("question", "answer", name="role_enum"), nullable=False
     )
     chat_content: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[DateTime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
-    updated_at: Mapped[DateTime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-    )
 
     # 관계 설정: Chats → User, Storages, Functions (N:1 관계)
     user: Mapped["User"] = relationship("User", back_populates="chats")
@@ -44,22 +36,14 @@ class Storages(Base):
     __tablename__ = "storages"
 
     user_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("user.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
     category_name: Mapped[str] = mapped_column(String(100), nullable=False)
     function_id: Mapped[str] = mapped_column(
-        CHAR(36), ForeignKey("functions.function_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
     )
     storage_title: Mapped[str] = mapped_column(String(255), nullable=False)
     storage_description: Mapped[str] = mapped_column(Text, nullable=True)
-    created_at: Mapped[DateTime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    )
-    updated_at: Mapped[DateTime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-    )
 
     # 관계 설정: Storages → User, Functions (N:1 관계)
     user: Mapped["User"] = relationship("User", back_populates="storages")
