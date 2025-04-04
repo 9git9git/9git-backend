@@ -44,7 +44,7 @@ class ComprehensiveEvaluations(Base):
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), nullable=False
+        DECIMAL(5, 2), default=0.00
     )
     evaluation_text: Mapped[str] = mapped_column(Text, nullable=True)
     strength_category: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -89,7 +89,7 @@ class MonthlyAchievements(Base):
     month_year: Mapped[Date] = mapped_column(Date, nullable=False)
     total_goal: Mapped[int] = mapped_column(Integer, nullable=False)
     completed_goal: Mapped[int] = mapped_column(Integer, nullable=False)
-    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
+    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
 
     # 관계 설정: MonthlyAchievements → User
     user: Mapped["User"] = relationship("User", back_populates="monthly_achievements")
