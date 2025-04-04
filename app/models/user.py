@@ -4,7 +4,7 @@ from uuid import UUID
 from enum import Enum as PyEnum
 from .base import Base
 from .category import Goal, TodayNote, CategoryProgress
-from .chat import Chat, Storage, Function
+from .chat import Chat, Storage
 from .evaluation import (
     RecommendedChallenge,
     ComprehensiveEvaluation,
