@@ -1,12 +1,8 @@
-from sqlalchemy import (
-    String,
-    DateTime,
-    MetaData,
-    func,
-)  # `func`을 추가하여 SQL 기본 함수 활용
+# `func`을 추가하여 SQL 기본 함수 활용
+from sqlalchemy import DateTime, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from uuid import UUID, uuid4
-from datetime import datetime, timezone
+from datetime import datetime
 import pytz
 
 # 한국 시간대 설정
@@ -29,8 +25,5 @@ class Base(DeclarativeBase):
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=True,
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
