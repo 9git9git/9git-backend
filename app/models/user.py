@@ -1,9 +1,8 @@
 from sqlalchemy import String, Integer, Enum, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID, uuid4
 from enum import Enum as PyEnum
 from .base import Base
-from sqlalchemy.orm import relationship
 from category import Goals, TodayNotes, CategoryProgress
 
 
@@ -30,10 +29,7 @@ class User(Base):
     user_characters: Mapped[list["UserCharacter"]] = relationship(
         "UserCharacter", back_populates="user"
     )
-    # User → Character (1:N 관계)
-    characters: Mapped[list["Character"]] = relationship(
-        "Character", back_populates="user"
-    )
+
     # User → Goals (1:N 관계)
     goals: Mapped[list["Goals"]] = relationship("Goals", back_populates="user")
 
@@ -58,10 +54,12 @@ class UserCharacter(Base):
     character_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("character.id"), nullable=False
     )
+
     # UserCharacter → User (N:1 관계)
     user: Mapped["User"] = relationship(
         "User", back_populates="user_characters", cascade="all, delete"
     )
+
     # UserCharacter → Character (N:1 관계)
     character: Mapped["Character"] = relationship(
         "Character", back_populates="user_characters", cascade="all, delete"
@@ -72,13 +70,11 @@ class UserCharacter(Base):
 class Character(Base):
     __tablename__ = "character"
 
+    user_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+    )
     level: Mapped[int] = mapped_column(Integer, nullable=False)
     image_link: Mapped[str] = mapped_column(String(255), nullable=False)
-
-    # Character → User (N:1 관계)
-    user: Mapped["User"] = relationship(
-        "User", back_populates="characters", cascade="all, delete"
-    )
 
     # Character → UserCharacter (1:N 관계)
     user_characters: Mapped[list["UserCharacter"]] = relationship(

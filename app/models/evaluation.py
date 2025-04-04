@@ -1,4 +1,14 @@
-from sqlalchemy import String, Text, Integer, DECIMAL, ForeignKey, DateTime, CHAR, Date
+from sqlalchemy import (
+    String,
+    Text,
+    Integer,
+    DECIMAL,
+    ForeignKey,
+    DateTime,
+    CHAR,
+    Date,
+    Enum,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
@@ -11,7 +21,7 @@ from .category import CategoryProgress
 class RecommendedChallenge(Base):
     __tablename__ = "recommended_challenge"
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     category_name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -21,7 +31,7 @@ class RecommendedChallenge(Base):
     challenge_difficulty: Mapped[str] = mapped_column(String(20), nullable=True)
     challenge_suggestion: Mapped[str] = mapped_column(Text, nullable=True)
 
-    # 관계 설정: RecommendedChallenge → User (N:1 관계) / User가 삭제되면 전부삭제
+    # 관계 설정: RecommendedChallenge → User (N:1 관계) / User가 삭제되면 전부 삭제
     user: Mapped["User"] = relationship(
         "User", back_populates="recommended_challenges", cascade="all, delete"
     )
@@ -31,22 +41,18 @@ class RecommendedChallenge(Base):
 class ComprehensiveEvaluations(Base):
     __tablename__ = "comprehensive_evaluations"
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), nullable=False
     )
     evaluation_text: Mapped[str] = mapped_column(Text, nullable=True)
-    strength_category: Mapped[str] = mapped_column(
-        String(100), ForeignKey("category_progress.category_name"), nullable=True
-    )
+    strength_category: Mapped[str] = mapped_column(String(100), nullable=True)
     strength_achievement_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
     strength_text: Mapped[str] = mapped_column(Text, nullable=True)
-    improvement_category: Mapped[str] = mapped_column(
-        String(100), ForeignKey("category_progress.category_name"), nullable=False
-    )
-    monthly_id: Mapped[str] = mapped_column(
+    improvement_category: Mapped[str] = mapped_column(String(100), nullable=False)
+    monthly_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("monthly_achievements.id"), nullable=True
     )
     improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
@@ -56,10 +62,7 @@ class ComprehensiveEvaluations(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="comprehensive_evaluations", cascade="all, delete"
     )
-    # 관계 설정: ComprehensiveEvaluations → CategoryProgress (N:1 관계)
-    category_progress: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="comprehensive_evaluations"
-    )
+
     # 관계 설정: ComprehensiveEvaluations → MonthlyAchievements (N:1 관계)
     monthly_achievement: Mapped["MonthlyAchievements"] = relationship(
         "MonthlyAchievements", back_populates="comprehensive_evaluations"
@@ -70,23 +73,16 @@ class ComprehensiveEvaluations(Base):
 class MonthlyAchievements(Base):
     __tablename__ = "monthly_achievements"
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )  # User를 참조
     category_name: Mapped[str] = mapped_column(
-        String(100), ForeignKey("category_progress.category_name"), nullable=False
-    )  # CategoryProgress를 참조
+        Enum("파이썬", "영어", "운동", name="category_enum"), nullable=False
+    )
     month_year: Mapped[Date] = mapped_column(Date, nullable=False)
     total_goal: Mapped[int] = mapped_column(Integer, nullable=False)
     completed_goal: Mapped[int] = mapped_column(Integer, nullable=False)
     progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
 
-    # 관계 설정: MonthlyAchievements → User, CategoryProgress (N:1 관계)
+    # 관계 설정: MonthlyAchievements → User
     user: Mapped["User"] = relationship("User", back_populates="monthly_achievements")
-    category_progress: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="monthly_achievements", cascade="all, delete"
-    )
-    # 관계 설정: MonthlyAchievements → ComprehensiveEvaluations (1:N 관계)
-    comprehensive_evaluations: Mapped[list["ComprehensiveEvaluations"]] = relationship(
-        "ComprehensiveEvaluations", back_populates="monthly_achievement"
-    )

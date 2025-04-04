@@ -2,7 +2,7 @@ from sqlalchemy import String, Text, Integer, Enum, ForeignKey, DateTime, CHAR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
-from .base import Base  # ✅ 공통적인 Base 클래스 임포트
+from .base import Base
 from .user import User
 
 
@@ -10,16 +10,18 @@ from .user import User
 class Chats(Base):
     __tablename__ = "chats"
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
-    storage_id: Mapped[str] = mapped_column(
+    storage_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("storages.id"), nullable=False
     )
-    function_id: Mapped[str] = mapped_column(
+    function_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
     )
-    category_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    category_name: Mapped[str] = mapped_column(
+        Enum("파이썬", "영어", "운동", name="category_enum"), nullable=False
+    )
     role: Mapped[str] = mapped_column(
         Enum("question", "answer", name="role_enum"), nullable=False
     )
@@ -35,11 +37,13 @@ class Chats(Base):
 class Storages(Base):
     __tablename__ = "storages"
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     )
-    category_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    function_id: Mapped[str] = mapped_column(
+    category_name: Mapped[str] = mapped_column(
+        Enum("파이썬", "영어", "운동", name="category_enum"), nullable=False
+    )
+    function_id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
     )
     storage_title: Mapped[str] = mapped_column(String(255), nullable=False)
