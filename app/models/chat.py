@@ -58,7 +58,7 @@ class Storage(Base):
         UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
     )
     storage_title: Mapped[str] = mapped_column(String(255), nullable=False)
-    storage_description: Mapped[str] = mapped_column(Text, nullable=False)
+    storage_description: Mapped[str] = mapped_column(Text)
 
     # Storage → User, Function (N:1 관계)
     user: Mapped["User"] = relationship(
@@ -77,7 +77,7 @@ class Function(Base):
     __tablename__ = "functions"
 
     function_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    function_description: Mapped[str] = mapped_column(Text, nullable=True)
+    function_description: Mapped[str] = mapped_column(Text)
     function_api: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Function → Storage, Chat (1:N 관계)
