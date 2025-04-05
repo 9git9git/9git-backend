@@ -53,6 +53,7 @@ class CategoryProgress(Base):
         "Goal", back_populates="category_progresses"
     )
 
+
 # 목표 관리 테이블 (Goal) (여러 목표가 한 카테고리에 연결됨)
 class Goal(Base):
     __tablename__ = "goals"
@@ -77,7 +78,7 @@ class Goal(Base):
         "User", back_populates="goals", cascade="all, delete"
     )
     category_progresses: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="goals, cascade="all, delete"
+        "CategoryProgress", back_populates="goals", cascade="all, delete"
     )
 
 
