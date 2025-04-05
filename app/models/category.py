@@ -8,14 +8,14 @@ from enum import Enum as PyEnum
 from .evaluation import RecommendedChallenge
 
 
-# 카테고리 Enum 클래스 정의
+#  CategoryNameEnum 클래스 정의
 class CategoryNameEnum(PyEnum):
     CODING = "코딩"
     ENGLISH = "영어"
     WORKOUT = "운동"
 
 
-# 색상 Enum 클래스 정의
+# CategoryColorEnum 클래스 정의
 class CategoryColorEnum(PyEnum):
     CODING = "#FDA63A"  # 호박색
     ENGLISH = "#6C88C4"  # 인디고 블루
@@ -41,7 +41,7 @@ class CategoryProgress(Base):
     users: Mapped["User"] = relationship(
         "User", back_populates="category_progresses", cascade="all, delete"
     )
-    goals: Mapped[list["Goal"]] = relationship(
+    goals: Mapped["Goal"] = relationship(
         "Goal", back_populates="category_progresses", cascade="all, delete"
     )
 

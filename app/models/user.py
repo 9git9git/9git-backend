@@ -31,7 +31,7 @@ class User(Base):
     age: Mapped[int] = mapped_column(Integer)
     job: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    # User → UserCharacter, Goal, TodayNote, CategoryProgress, Chat, Storage, ComprehensiveEvaluation, MonthlyAchievement, RecommendedChallenge (1:N 관계)
+    # User → UserCharacter, Goal, TodayNote, CategoryProgress, Chat, Storage, ComprehensiveEvaluation, MonthlyAchievement (1:N 관계)
     user_characters: Mapped[list["UserCharacter"]] = relationship(
         "UserCharacter", back_populates="users"
     )
@@ -49,9 +49,6 @@ class User(Base):
     )
     monthly_achievements: Mapped[list["MonthlyAchievement"]] = relationship(
         "MonthlyAchievement", back_populates="users"
-    )
-    recommended_challenges: Mapped[list["RecommendedChallenge"]] = relationship(
-        "RecommendedChallenge", back_populates="users"
     )
 
 

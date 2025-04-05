@@ -19,15 +19,12 @@ class RecommendedChallenge(Base):
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
     progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
-    challenge_task: Mapped[str] = mapped_column(Text, nullable=True)
-    challenge_duration: Mapped[str] = mapped_column(String(50), nullable=True)
-    challenge_difficulty: Mapped[str] = mapped_column(String(20), nullable=True)
-    challenge_suggestion: Mapped[str] = mapped_column(Text, nullable=True)
+    challenge_task: Mapped[str] = mapped_column(Text)
+    challenge_duration: Mapped[str] = mapped_column(String(50))
+    challenge_difficulty: Mapped[str] = mapped_column(String(20))
+    challenge_suggestion: Mapped[str] = mapped_column(Text)
 
-    # RecommendedChallenge → User, CategoryProgress (N:1 관계)
-    user: Mapped["User"] = relationship(
-        "User", back_populates="recommended_challenges", cascade="all, delete"
-    )
+    # RecommendedChallenge → CategoryProgress (N:1 관계)
     category_progress: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress",
         back_populates="recommended_challenges",
@@ -45,14 +42,16 @@ class ComprehensiveEvaluation(Base):
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00
     )
-    evaluation_text: Mapped[str] = mapped_column(Text, nullable=False)
+    evaluation_text: Mapped[str] = mapped_column(Text, nullable=True)
     strength_category: Mapped[str] = mapped_column(String(100), nullable=False)
     strength_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00
     )
-    strength_text: Mapped[str] = mapped_column(Text, nullable=False)
+    strength_text: Mapped[str] = mapped_column(Text, nullable=True)
     improvement_category: Mapped[str] = mapped_column(String(100), nullable=False)
-    improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2))
+    improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(5, 2), default=0.00
+    )
     improvement_text: Mapped[str] = mapped_column(Text, nullable=False)
 
     # ComprehensiveEvaluation → User, MonthlyAchievement, CategoryProgress (N:1 관계)
