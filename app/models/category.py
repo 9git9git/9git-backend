@@ -37,22 +37,21 @@ class CategoryProgress(Base):
     completed_goal: Mapped[int] = mapped_column(Integer, nullable=False)
     progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
 
-    # CategoryProgress → User, Goal (N : 1 관계)
+    # CategoryProgress → User (N : 1 관계)
     users: Mapped["User"] = relationship(
         "User", back_populates="category_progresses", cascade="all, delete"
     )
-    goals: Mapped["Goal"] = relationship(
-        "Goal", back_populates="category_progresses", cascade="all, delete"
-    )
 
-    # CategoryProgress → ComprehensiveEvaluation, RecommendedChallenge (1 : N 관계)
+    # CategoryProgress → ComprehensiveEvaluation, RecommendedChallenge, Goal (1 : N 관계)
     comprehensive_evaluations: Mapped[list["ComprehensiveEvaluation"]] = relationship(
         "ComprehensiveEvaluation", back_populates="category_progresses"
     )
     recommended_challenges: Mapped[list["RecommendedChallenge"]] = relationship(
         "RecommendedChallenge", back_populates="category_progresses"
     )
-
+    goals: Mapped[list["Goal"]] = relationship(
+        "Goal", back_populates="category_progresses"
+    )
 
 # 목표 관리 테이블 (Goal) (여러 목표가 한 카테고리에 연결됨)
 class Goal(Base):
@@ -73,14 +72,12 @@ class Goal(Base):
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_repeat: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    # Goal → User (N : 1 관계)
+    # Goal → User, CategoryProgresses (N : 1 관계)
     users: Mapped["User"] = relationship(
         "User", back_populates="goals", cascade="all, delete"
     )
-
-    # Goal → CategoryProgress (1 : N 관계)
-    category_progresses: Mapped[list["CategoryProgress"]] = relationship(
-        "CategoryProgress", back_populates="goals"
+    category_progresses: Mapped["CategoryProgress"] = relationship(
+        "CategoryProgress", back_populates="goals, cascade="all, delete"
     )
 
 
