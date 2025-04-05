@@ -13,7 +13,7 @@ class RecommendedChallenge(Base):
         UUID(as_uuid=True), ForeignKey("category_progresses.id"), nullable=False
     )
     user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("CategoryProgresses.user_id"), nullable=False
+        UUID(as_uuid=True), ForeignKey("category_progresses.user_id"), nullable=False
     )  # CategoryProgresses클래스의 user_id 참조
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
