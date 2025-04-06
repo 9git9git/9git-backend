@@ -66,7 +66,7 @@ class ComprehensiveEvaluation(Base):
         back_populates="comprehensive_evaluations",
         cascade="all, delete",
     )
-    category_progresse: Mapped["CategoryProgress"] = relationship(
+    category_progress: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress",
         back_populates="comprehensive_evaluations",
         cascade="all, delete",
