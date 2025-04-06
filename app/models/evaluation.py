@@ -4,6 +4,7 @@ from uuid import UUID
 from .base import Base
 from .user import User
 from .category import CategoryProgress, CategoryNameEnum
+from typing import List
 
 
 # RecommendedChallenge 테이블 (추천 챌린지)
@@ -95,6 +96,6 @@ class MonthlyAchievement(Base):
     )
 
     # MonthlyAchievement → ComprehensiveEvaluation (1:N 관계)
-    comprehensive_evaluations: Mapped[list["ComprehensiveEvaluation"]] = relationship(
+    comprehensive_evaluations: Mapped[List["ComprehensiveEvaluation"]] = relationship(
         "ComprehensiveEvaluation", back_populates="monthly_achievements"
     )

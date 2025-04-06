@@ -5,6 +5,7 @@ from .base import Base
 from .user import User
 from enum import Enum as PyEnum
 from .category import CategoryNameEnum
+from typing import List
 
 
 # Role Enum 클래스 정의
@@ -36,10 +37,10 @@ class Chat(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="chats", cascade="all, delete"
     )
-    storage: Mapped["Storage"] = relationship(
+    storages: Mapped["Storage"] = relationship(
         "Storage", back_populates="chats", cascade="all, delete"
     )
-    function: Mapped["Function"] = relationship(
+    functions: Mapped["Function"] = relationship(
         "Function", back_populates="chats", cascade="all, delete"
     )
 
@@ -61,15 +62,15 @@ class Storage(Base):
     storage_description: Mapped[str] = mapped_column(Text)
 
     # Storage → User, Function (N:1 관계)
-    user: Mapped["User"] = relationship(
+    users: Mapped["User"] = relationship(
         "User", back_populates="storages", cascade="all, delete"
     )
-    function: Mapped["Function"] = relationship(
+    functions: Mapped["Function"] = relationship(
         "Function", back_populates="storages", cascade="all, delete"
     )
 
     # Storage → Chat (1:N 관계)
-    chats: Mapped[list["Chat"]] = relationship("Chat", back_populates="storages")
+    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="storages")
 
 
 # Function 테이블 (함수 API 정보)
@@ -81,7 +82,7 @@ class Function(Base):
     function_api: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Function → Storage, Chat (1:N 관계)
-    storages: Mapped[list["Storage"]] = relationship(
+    storages: Mapped[List["Storage"]] = relationship(
         "Storage", back_populates="functions"
     )
-    chats: Mapped[list["Chat"]] = relationship("Chat", back_populates="functions")
+    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="functions")

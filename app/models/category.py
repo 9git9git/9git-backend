@@ -6,6 +6,7 @@ from .evaluation import ComprehensiveEvaluation
 from .user import User
 from enum import Enum as PyEnum
 from .evaluation import RecommendedChallenge
+from typing import List
 
 
 #  CategoryNameEnum 클래스 정의
@@ -38,18 +39,18 @@ class CategoryProgress(Base):
     progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
 
     # CategoryProgress → User (N : 1 관계)
-    users: Mapped["User"] = relationship(
+    user: Mapped["User"] = relationship(
         "User", back_populates="category_progresses", cascade="all, delete"
     )
 
     # CategoryProgress → ComprehensiveEvaluation, RecommendedChallenge, Goal (1 : N 관계)
-    comprehensive_evaluations: Mapped[list["ComprehensiveEvaluation"]] = relationship(
+    comprehensive_evaluations: Mapped[List["ComprehensiveEvaluation"]] = relationship(
         "ComprehensiveEvaluation", back_populates="category_progresses"
     )
-    recommended_challenges: Mapped[list["RecommendedChallenge"]] = relationship(
+    recommended_challenges: Mapped[List["RecommendedChallenge"]] = relationship(
         "RecommendedChallenge", back_populates="category_progresses"
     )
-    goals: Mapped[list["Goal"]] = relationship(
+    goals: Mapped[List["Goal"]] = relationship(
         "Goal", back_populates="category_progresses"
     )
 
@@ -74,7 +75,7 @@ class Goal(Base):
     is_repeat: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     # Goal → User, CategoryProgresses (N : 1 관계)
-    users: Mapped["User"] = relationship(
+    user: Mapped["User"] = relationship(
         "User", back_populates="goals", cascade="all, delete"
     )
     category_progresses: Mapped["CategoryProgress"] = relationship(
@@ -96,6 +97,6 @@ class TodayNote(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
     # TodayNote → User (N : 1 관계)
-    users: Mapped["User"] = relationship(
+    user: Mapped["User"] = relationship(
         "User", back_populates="today_notes", cascade="all, delete"
     )

@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Enum, ForeignKey, Date, DECIMAL, Boolean, Text
+from sqlalchemy import String, Integer, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from enum import Enum as PyEnum
@@ -6,10 +6,10 @@ from .base import Base
 from .category import Goal, TodayNote, CategoryProgress
 from .chat import Chat, Storage
 from .evaluation import (
-    RecommendedChallenge,
     ComprehensiveEvaluation,
     MonthlyAchievement,
 )
+from typing import List
 
 
 # 성별 Enum 클래스
@@ -32,23 +32,23 @@ class User(Base):
     job: Mapped[str] = mapped_column(String(100))
 
     # User → UserCharacter, Goal, TodayNote, CategoryProgress, Chat, Storage, ComprehensiveEvaluation, MonthlyAchievement (1:N 관계)
-    user_characters: Mapped[list["UserCharacter"]] = relationship(
-        "UserCharacter", back_populates="users"
+    user_characters: Mapped[List["UserCharacter"]] = relationship(
+        "UserCharacter", back_populates="user"
     )
-    goals: Mapped[list["Goal"]] = relationship("Goal", back_populates="users")
-    today_notes: Mapped[list["TodayNote"]] = relationship(
-        "TodayNote", back_populates="users"
+    goals: Mapped[List["Goal"]] = relationship("Goal", back_populates="user")
+    today_notes: Mapped[List["TodayNote"]] = relationship(
+        "TodayNote", back_populates="user"
     )
-    category_progresses: Mapped[list["CategoryProgress"]] = relationship(
-        "CategoryProgress", back_populates="users"
+    category_progresses: Mapped[List["CategoryProgress"]] = relationship(
+        "CategoryProgress", back_populates="user"
     )
-    chats: Mapped[list["Chat"]] = relationship("Chat", back_populates="users")
-    storages: Mapped[list["Storage"]] = relationship("Storage", back_populates="users")
-    comprehensive_evaluations: Mapped[list["ComprehensiveEvaluation"]] = relationship(
-        "ComprehensiveEvaluation", back_populates="users"
+    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="user")
+    storages: Mapped[List["Storage"]] = relationship("Storage", back_populates="user")
+    comprehensive_evaluations: Mapped[List["ComprehensiveEvaluation"]] = relationship(
+        "ComprehensiveEvaluation", back_populates="user"
     )
-    monthly_achievements: Mapped[list["MonthlyAchievement"]] = relationship(
-        "MonthlyAchievement", back_populates="users"
+    monthly_achievements: Mapped[List["MonthlyAchievement"]] = relationship(
+        "MonthlyAchievement", back_populates="user"
     )
 
 
@@ -67,7 +67,7 @@ class UserCharacter(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="user_characters", cascade="all, delete"
     )
-    character: Mapped["Character"] = relationship(
+    characters: Mapped["Character"] = relationship(
         "Character", back_populates="user_characters", cascade="all, delete"
     )
 
@@ -81,6 +81,6 @@ class Character(Base):
     image_link: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Character → UserCharacter (1:N 관계)
-    user_characters: Mapped[list["UserCharacter"]] = relationship(
+    user_characters: Mapped[List["UserCharacter"]] = relationship(
         "UserCharacter", back_populates="characters"
     )
