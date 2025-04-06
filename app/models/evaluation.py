@@ -42,12 +42,12 @@ class ComprehensiveEvaluation(Base):
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00
     )
-    evaluation_text: Mapped[str] = mapped_column(Text, nullable=True)
+    evaluation_text: Mapped[str] = mapped_column(Text)
     strength_category: Mapped[str] = mapped_column(String(100), nullable=False)
     strength_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00
     )
-    strength_text: Mapped[str] = mapped_column(Text, nullable=True)
+    strength_text: Mapped[str] = mapped_column(Text)
     improvement_category: Mapped[str] = mapped_column(String(100), nullable=False)
     improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00
