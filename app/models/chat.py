@@ -37,10 +37,10 @@ class Chat(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="chats", cascade="all, delete"
     )
-    storages: Mapped["Storage"] = relationship(
+    storage: Mapped["Storage"] = relationship(
         "Storage", back_populates="chats", cascade="all, delete"
     )
-    functions: Mapped["Function"] = relationship(
+    function: Mapped["Function"] = relationship(
         "Function", back_populates="chats", cascade="all, delete"
     )
 
@@ -62,10 +62,10 @@ class Storage(Base):
     storage_description: Mapped[str] = mapped_column(Text)
 
     # Storage → User, Function (N:1 관계)
-    users: Mapped["User"] = relationship(
+    user: Mapped["User"] = relationship(
         "User", back_populates="storages", cascade="all, delete"
     )
-    functions: Mapped["Function"] = relationship(
+    function: Mapped["Function"] = relationship(
         "Function", back_populates="storages", cascade="all, delete"
     )
 

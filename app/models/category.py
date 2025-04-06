@@ -78,7 +78,7 @@ class Goal(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="goals", cascade="all, delete"
     )
-    category_progresses: Mapped["CategoryProgress"] = relationship(
+    category_progress: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress", back_populates="goals", cascade="all, delete"
     )
 

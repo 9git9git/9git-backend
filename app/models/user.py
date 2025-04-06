@@ -33,22 +33,22 @@ class User(Base):
 
     # User → UserCharacter, Goal, TodayNote, CategoryProgress, Chat, Storage, ComprehensiveEvaluation, MonthlyAchievement (1:N 관계)
     user_characters: Mapped[List["UserCharacter"]] = relationship(
-        "UserCharacter", back_populates="user"
+        "UserCharacter", back_populates="users"
     )
-    goals: Mapped[List["Goal"]] = relationship("Goal", back_populates="user")
+    goals: Mapped[List["Goal"]] = relationship("Goal", back_populates="users")
     today_notes: Mapped[List["TodayNote"]] = relationship(
-        "TodayNote", back_populates="user"
+        "TodayNote", back_populates="users"
     )
     category_progresses: Mapped[List["CategoryProgress"]] = relationship(
-        "CategoryProgress", back_populates="user"
+        "CategoryProgress", back_populates="users"
     )
-    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="user")
-    storages: Mapped[List["Storage"]] = relationship("Storage", back_populates="user")
+    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="users")
+    storages: Mapped[List["Storage"]] = relationship("Storage", back_populates="users")
     comprehensive_evaluations: Mapped[List["ComprehensiveEvaluation"]] = relationship(
-        "ComprehensiveEvaluation", back_populates="user"
+        "ComprehensiveEvaluation", back_populates="users"
     )
     monthly_achievements: Mapped[List["MonthlyAchievement"]] = relationship(
-        "MonthlyAchievement", back_populates="user"
+        "MonthlyAchievement", back_populates="users"
     )
 
 
@@ -67,7 +67,7 @@ class UserCharacter(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="user_characters", cascade="all, delete"
     )
-    characters: Mapped["Character"] = relationship(
+    character: Mapped["Character"] = relationship(
         "Character", back_populates="user_characters", cascade="all, delete"
     )
 
