@@ -28,7 +28,7 @@ class RecommendedChallenge(Base):
     challenge_suggestion: Mapped[str] = mapped_column(Text)
 
     # RecommendedChallenge → CategoryProgress (N:1 관계)
-    category_progress: Mapped["CategoryProgress"] = relationship(
+    category_progresses: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress",
         back_populates="recommended_challenges",
         cascade="all, delete",
@@ -66,7 +66,7 @@ class ComprehensiveEvaluation(Base):
         back_populates="comprehensive_evaluations",
         cascade="all, delete",
     )
-    category_progress: Mapped["CategoryProgress"] = relationship(
+    category_progresses: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress",
         back_populates="comprehensive_evaluations",
         cascade="all, delete",
