@@ -18,7 +18,9 @@ class RecommendedChallenge(Base):
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
-    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
+    progress_rate: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(5, 2), default=0.00, nullable=False
+    )
     challenge_task: Mapped[str] = mapped_column(Text)
     challenge_duration: Mapped[str] = mapped_column(String(50))
     challenge_difficulty: Mapped[str] = mapped_column(String(20))
@@ -40,19 +42,19 @@ class ComprehensiveEvaluation(Base):
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
     )
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00
+        DECIMAL(5, 2), default=0.00, nullable=False
     )
     evaluation_text: Mapped[str] = mapped_column(Text)
     strength_category: Mapped[str] = mapped_column(String(100), nullable=False)
     strength_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00
+        DECIMAL(5, 2), default=0.00, nullable=False
     )
     strength_text: Mapped[str] = mapped_column(Text)
     improvement_category: Mapped[str] = mapped_column(String(100), nullable=False)
     improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00
+        DECIMAL(5, 2), default=0.00, nullable=False
     )
-    improvement_text: Mapped[str] = mapped_column(Text, nullable=False)
+    improvement_text: Mapped[str] = mapped_column(Text)
 
     # ComprehensiveEvaluation → User, MonthlyAchievement, CategoryProgress (N:1 관계)
     user: Mapped["User"] = relationship(
@@ -83,7 +85,9 @@ class MonthlyAchievement(Base):
     month_year: Mapped[Date] = mapped_column(Date, nullable=False)
     total_goal: Mapped[int] = mapped_column(Integer, nullable=False)
     completed_goal: Mapped[int] = mapped_column(Integer, nullable=False)
-    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
+    progress_rate: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(5, 2), default=0.00, nullable=False
+    )
 
     # MonthlyAchievement → User (N:1 관계)
     user: Mapped["User"] = relationship(

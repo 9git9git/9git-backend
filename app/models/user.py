@@ -29,7 +29,7 @@ class User(Base):
         Enum(GenderEnum, name="gender_enum"), nullable=False
     )
     age: Mapped[int] = mapped_column(Integer)
-    job: Mapped[str] = mapped_column(String(100), nullable=False)
+    job: Mapped[str] = mapped_column(String(100))
 
     # User → UserCharacter, Goal, TodayNote, CategoryProgress, Chat, Storage, ComprehensiveEvaluation, MonthlyAchievement (1:N 관계)
     user_characters: Mapped[list["UserCharacter"]] = relationship(
