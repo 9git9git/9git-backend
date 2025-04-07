@@ -9,6 +9,7 @@
 poetry install --no-root
 
 # 서버 실행
+# uvicorn app.main:app --reload # 이 명령어도 사용 가능
 poetry run uvicorn app.main:app --reload
 ```
 
@@ -32,9 +33,10 @@ poetry run pytest --cov=app
 │   ├── models    # SQLAlchemy 모델 정의
 │   ├── schemas   # Pydantic 스키마 정의
 │   ├── services  # 비즈니스 로직 처리 (CRUD 외 추가적인 로직)
-│   └── tests     # 테스트 코드
-│   └── utils     # 유틸 코드
-│   ├── main.py   # FastAPI 애플리케이션 진입점
+│   ├── tests     # 테스트 코드
+│   ├── utils     # 유틸 코드
+│   └── main.py   # FastAPI 애플리케이션 진입점
+├── docs          # 문서
 ├── migrations    # Alembic 마이그레이션 파일
 │   └── env.py
 ├── poetry.lock
