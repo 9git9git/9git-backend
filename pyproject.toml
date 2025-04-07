@@ -3,7 +3,11 @@ name = "9git-backend"
 version = "0.0.1"
 description = ""
 authors = [
-    {name = "Eatcoding",email = "trivialcoding6@gmail.com"}
+    {name = "codingorijazz", email = "coding_jazzman@naver.com"},
+    {name = "Eatcoding", email = "trivialcoding6@gmail.com"},
+    {name = "gideok kim", email = "noah.dev4127@gmail.com"},
+    {name = "chaeengg", email = "bchaeeun99@gmail.com"},
+    {name = "Ryan-OH", email = "dongjune0971@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
