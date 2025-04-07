@@ -3,6 +3,8 @@ from app.core.config import settings
 from contextlib import asynccontextmanager
 from loguru import logger
 from app.core.logging import setup_logging
+from app.db.base import init_db
+import asyncio
 
 
 @asynccontextmanager
@@ -10,8 +12,15 @@ async def lifespan(app: FastAPI):
     # 시작 시 실행
     setup_logging()
     logger.info("Application starting up...")
-    yield
-    logger.info("Application shutting down...")
+    # yield
+    # logger.info("Application shutting down...")
+    try:
+        await init_db()
+        yield
+    except asyncio.CancelledError:
+        pass
+    finally:
+        pass
 
 
 app = FastAPI(
