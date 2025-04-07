@@ -6,7 +6,7 @@
 
 ```bash
 # 의존성 설치
-poetry install
+poetry install --no-root
 
 # 서버 실행
 poetry run uvicorn app.main:app --reload
