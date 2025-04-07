@@ -111,3 +111,10 @@ try:
 except Exception as e:
     logger.exception(f"예외 발생: {e}")
 ```
+
+## 5. 기술 스택
+
+- **Poetry**: 의존성 관리 도구
+- **FastAPI**: 웹 API 프레임워크
+- **Uvicorn**: ASGI 서버 라이브러리
+- **SQLAlchemy**: SQL 툴킷 & ORM 라이브러리
