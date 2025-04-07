@@ -79,6 +79,6 @@ class Function(Base):
 
     # Function → Storage, Chat (1:N 관계)
     storages: Mapped[List["Storage"]] = relationship(
-        "Storage", back_populates="functions"
+        "Storage", back_populates="function"
     )
-    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="functions")
+    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="function")
