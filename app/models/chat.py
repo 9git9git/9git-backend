@@ -1,4 +1,4 @@
-from sqlalchemy import String, Text, Enum, ForeignKey
+from sqlalchemy import String, Text, Enum, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from .base import Base
@@ -28,21 +28,19 @@ class Chat(Base):
         UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
     )
     category_name: Mapped[CategoryNameEnum] = mapped_column(
-        Enum(CategoryNameEnum, name="category_name_enumss"), nullable=False
+        Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
     role: Mapped[str] = mapped_column(Enum(RoleEnum, name="role_enums"), nullable=False)
     chat_content: Mapped[str] = mapped_column(Text, nullable=False)
 
+    __table_args__ = ForeignKeyConstraint(
+        ["user_id", "storage_id"], ["storages.user_id", "storages.id"]
+    )
+
     # Chat → User, Storage, Function (N:1 관계)
-    user: Mapped["User"] = relationship(
-        "User", back_populates="chats", cascade="all, delete"
-    )
-    storage: Mapped["Storage"] = relationship(
-        "Storage", back_populates="chats", cascade="all, delete"
-    )
-    function: Mapped["Function"] = relationship(
-        "Function", back_populates="chats", cascade="all, delete"
-    )
+    user: Mapped["User"] = relationship("User", back_populates="chats")
+    storage: Mapped["Storage"] = relationship("Storage", back_populates="chats")
+    function: Mapped["Function"] = relationship("Function", back_populates="chats")
 
 
 # Storage 테이블 (저장된 콘텐츠)
@@ -62,15 +60,13 @@ class Storage(Base):
     storage_description: Mapped[str] = mapped_column(Text)
 
     # Storage → User, Function (N:1 관계)
-    user: Mapped["User"] = relationship(
-        "User", back_populates="storages", cascade="all, delete"
-    )
-    function: Mapped["Function"] = relationship(
-        "Function", back_populates="storages", cascade="all, delete"
-    )
+    user: Mapped["User"] = relationship("User", back_populates="storages")
+    function: Mapped["Function"] = relationship("Function", back_populates="storages")
 
     # Storage → Chat (1:N 관계)
-    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="storages")
+    chats: Mapped[List["Chat"]] = relationship(
+        "Chat", back_populates="storages", cascade="all, delete"
+    )
 
 
 # Function 테이블 (함수 API 정보)
