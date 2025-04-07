@@ -1,7 +1,8 @@
 # `func`을 추가하여 SQL 기본 함수 활용
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from uuid import UUID, uuid4
+from sqlalchemy.dialects.postgresql import UUID
+from uuid import uuid4
 from datetime import datetime
 import pytz
 
