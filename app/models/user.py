@@ -60,11 +60,9 @@ class User(Base):
 class UserCharacter(Base):
     __tablename__ = "user_characters"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     character_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("characters.id"), nullable=False
+        ForeignKey("characters.id"), nullable=False
     )
 
     # UserCharacter → User, Character (N:1 관계)

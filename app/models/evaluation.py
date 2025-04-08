@@ -32,11 +32,12 @@ class ImprovementCategoryEnum(PyEnum):
 # RecommendedChallenge 테이블 (추천 챌린지)
 class RecommendedChallenge(Base):
     __tablename__ = "recommended_challenges"
-    progress_id = Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("category_progresses.id"), nullable=False
+
+    progress_id: Mapped[UUID] = mapped_column(
+        ForeignKey("category_progresses.id"), nullable=False
     )
     user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+        ForeignKey("users.id"), nullable=False
     )  # CategoryProgresses클래스의 user_id 참조
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
@@ -68,11 +69,9 @@ class RecommendedChallenge(Base):
 class ComprehensiveEvaluation(Base):
     __tablename__ = "comprehensive_evaluations"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     progress_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("category_progresses.id"), nullable=False
+        ForeignKey("category_progresses.id"), nullable=False
     )
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
@@ -111,9 +110,7 @@ class ComprehensiveEvaluation(Base):
 class MonthlyAchievement(Base):
     __tablename__ = "monthly_achievements"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )

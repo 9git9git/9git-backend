@@ -18,14 +18,10 @@ class RoleEnum(PyEnum):
 class Chat(Base):
     __tablename__ = "chats"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
-    storage_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("storages.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    storage_id: Mapped[UUID] = mapped_column(ForeignKey("storages.id"), nullable=False)
     function_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
+        ForeignKey("functions.id"), nullable=False
     )
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
@@ -47,14 +43,12 @@ class Chat(Base):
 class Storage(Base):
     __tablename__ = "storages"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
     function_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
+        ForeignKey("functions.id"), nullable=False
     )
     storage_title: Mapped[str] = mapped_column(String(255), nullable=False)
     storage_description: Mapped[str] = mapped_column(Text)
