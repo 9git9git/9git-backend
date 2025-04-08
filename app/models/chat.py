@@ -61,7 +61,7 @@ class Storage(Base):
 
     # Storage → Chat (1:N 관계)
     chats: Mapped[List["Chat"]] = relationship(
-        "Chat", back_populates="storages", cascade="all, delete"
+        "Chat", back_populates="storage", cascade="all, delete"
     )
 
 

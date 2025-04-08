@@ -91,5 +91,5 @@ class Character(Base):
 
     # Character → UserCharacter (1:N 관계)
     user_characters: Mapped[List["UserCharacter"]] = relationship(
-        "UserCharacter", back_populates="characters", cascade="all, delete"
+        "UserCharacter", back_populates="character", cascade="all, delete"
     )
