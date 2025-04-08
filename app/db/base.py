@@ -26,6 +26,11 @@ async def init_db():
     # Base는 이 함수 내에서만 사용 가능
     from app.models.base import Base
 
+    import app.models.user
+    import app.models.category
+    import app.models.chat
+    import app.models.evaluation
+
     try:
         async with engine.begin() as conn:
             logger.info("Initializing database...")
