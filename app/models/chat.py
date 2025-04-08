@@ -1,11 +1,11 @@
 from sqlalchemy import String, Text, Enum, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
+from enum import Enum as PyEnum
+from typing import List
 from .base import Base
 from .user import User
-from enum import Enum as PyEnum
 from .category import CategoryNameEnum
-from typing import List
 
 
 # Role Enum 클래스 정의
@@ -18,14 +18,10 @@ class RoleEnum(PyEnum):
 class Chat(Base):
     __tablename__ = "chats"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
-    storage_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("storages.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    storage_id: Mapped[UUID] = mapped_column(ForeignKey("storages.id"), nullable=False)
     function_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
+        ForeignKey("functions.id"), nullable=False
     )
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
@@ -33,8 +29,10 @@ class Chat(Base):
     role: Mapped[str] = mapped_column(Enum(RoleEnum, name="role_enums"), nullable=False)
     chat_content: Mapped[str] = mapped_column(Text, nullable=False)
 
-    __table_args__ = ForeignKeyConstraint(
-        ["user_id", "storage_id"], ["storages.user_id", "storages.id"]
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "storage_id"], ["storages.user_id", "storages.id"]
+        ),
     )
 
     # Chat → User, Storage, Function (N:1 관계)
@@ -47,14 +45,12 @@ class Chat(Base):
 class Storage(Base):
     __tablename__ = "storages"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
     function_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("functions.id"), nullable=False
+        ForeignKey("functions.id"), nullable=False
     )
     storage_title: Mapped[str] = mapped_column(String(255), nullable=False)
     storage_description: Mapped[str] = mapped_column(Text)
@@ -65,7 +61,7 @@ class Storage(Base):
 
     # Storage → Chat (1:N 관계)
     chats: Mapped[List["Chat"]] = relationship(
-        "Chat", back_populates="storages", cascade="all, delete"
+        "Chat", back_populates="storage", cascade="all, delete"
     )
 
 

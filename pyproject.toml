@@ -3,7 +3,11 @@ name = "9git-backend"
 version = "0.0.1"
 description = ""
 authors = [
-    {name = "Eatcoding",email = "trivialcoding6@gmail.com"}
+    {name = "codingorijazz", email = "coding_jazzman@naver.com"},
+    {name = "Eatcoding", email = "trivialcoding6@gmail.com"},
+    {name = "gideok kim", email = "noah.dev4127@gmail.com"},
+    {name = "chaeengg", email = "bchaeeun99@gmail.com"},
+    {name = "Ryan-OH", email = "dongjune0971@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
@@ -16,7 +20,8 @@ dependencies = [
     "sqlalchemy (>=2.0.40,<3.0.0)",
     "asyncpg (>=0.30.0,<0.31.0)",
     "alembic (>=1.15.1,<2.0.0)",
-    "loguru (>=0.7.3,<0.8.0)"
+    "loguru (>=0.7.3,<0.8.0)",
+    "pytz (>=2025.2,<2026.0)"
 ]
 
 

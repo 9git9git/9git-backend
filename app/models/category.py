@@ -11,12 +11,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from .base import Base
-from .evaluation import ComprehensiveEvaluation
-from .user import User
 from enum import Enum as PyEnum
-from .evaluation import RecommendedChallenge, MonthlyAchievement
 from typing import List
+from .base import Base
+from .user import User
 
 
 #  CategoryNameEnum 클래스 정의
@@ -37,9 +35,7 @@ class CategoryColorEnum(PyEnum):
 class CategoryProgress(Base):
     __tablename__ = "category_progresses"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
@@ -52,22 +48,29 @@ class CategoryProgress(Base):
     user: Mapped["User"] = relationship("User", back_populates="category_progresses")
 
     # CategoryProgress → ComprehensiveEvaluation, RecommendedChallenge, Goal, MonthlyAchievement (1 : N 관계)
-    comprehensive_evaluations: Mapped[List["ComprehensiveEvaluation"]] = relationship(
-        "ComprehensiveEvaluation",
+    comprehensive_evaluations: Mapped[
+        List["app.models.evaluation.ComprehensiveEvaluation"]
+    ] = relationship(
+        "app.models.evaluation.ComprehensiveEvaluation",
         back_populates="category_progress",
         cascade="all, delete",
     )
-    recommended_challenges: Mapped[List["RecommendedChallenge"]] = relationship(
-        "RecommendedChallenge",
+    recommended_challenges: Mapped[
+        List["app.models.evaluation.RecommendedChallenge"]
+    ] = relationship(
+        "app.models.evaluation.RecommendedChallenge",
         back_populates="category_progress",
         cascade="all, delete",
     )
     goals: Mapped[List["Goal"]] = relationship(
         "Goal", back_populates="category_progress", cascade="all, delete"
     )
-
-    monthly_achievement: Mapped["MonthlyAchievement"] = relationship(
-        "MonthlyAchievement", back_populates="category_progress", cascade="all, delete"
+    monthly_achievements: Mapped[List["app.models.evaluation.MonthlyAchievement"]] = (
+        relationship(
+            "app.models.evaluation.MonthlyAchievement",
+            back_populates="category_progress",
+            cascade="all, delete",
+        )
     )
 
 
@@ -75,9 +78,7 @@ class CategoryProgress(Base):
 class Goal(Base):
     __tablename__ = "goals"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
@@ -90,9 +91,11 @@ class Goal(Base):
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_repeat: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    __table_args__ = ForeignKeyConstraint(
-        ["user_id", "category_name"],
-        ["category_progresses.user_id", "category_progresses.category_name"],
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "category_name"],
+            ["category_progresses.user_id", "category_progresses.category_name"],
+        ),
     )
 
     # Goal → User, CategoryProgresses (N : 1 관계)
@@ -106,9 +109,7 @@ class Goal(Base):
 class TodayNote(Base):
     __tablename__ = "today_notes"
 
-    user_id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
