@@ -12,15 +12,13 @@ async def lifespan(app: FastAPI):
     # 시작 시 실행
     setup_logging()
     logger.info("Application starting up...")
-    # yield
-    # logger.info("Application shutting down...")
     try:
         await init_db()
         yield
     except asyncio.CancelledError:
-        pass
+        logger.warning("Lifespan tasks cancelled")
     finally:
-        pass
+        logger.info("Application shutting down...")
 
 
 app = FastAPI(
