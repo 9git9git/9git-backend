@@ -22,9 +22,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    sex: Mapped[GenderEnum] = mapped_column(
-        Enum(GenderEnum, name="gender_enum"), nullable=False
-    )
+    sex: Mapped[GenderEnum] = mapped_column(Enum(GenderEnum, name="gender_enum"))
     age: Mapped[int] = mapped_column(Integer)
     job: Mapped[str] = mapped_column(String(100))
     level: Mapped[int] = mapped_column(Integer, default=1)
