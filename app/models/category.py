@@ -65,7 +65,7 @@ class CategoryProgress(Base):
     goals: Mapped[List["Goal"]] = relationship(
         "Goal", back_populates="category_progress", cascade="all, delete"
     )
-    monthly_achievements: Mapped["app.models.evaluation.MonthlyAchievement"] = (
+    monthly_achievements: Mapped[List["app.models.evaluation.MonthlyAchievement"]] = (
         relationship(
             "app.models.evaluation.MonthlyAchievement",
             back_populates="category_progress",
