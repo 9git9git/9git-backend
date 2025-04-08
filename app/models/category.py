@@ -91,9 +91,11 @@ class Goal(Base):
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_repeat: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    __table_args__ = ForeignKeyConstraint(
-        ["user_id", "category_name"],
-        ["category_progresses.user_id", "category_progresses.category_name"],
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "category_name"],
+            ["category_progresses.user_id", "category_progresses.category_name"],
+        ),
     )
 
     # Goal → User, CategoryProgresses (N : 1 관계)

@@ -1,11 +1,11 @@
 from sqlalchemy import String, Text, Enum, ForeignKey, ForeignKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
+from enum import Enum as PyEnum
+from typing import List
 from .base import Base
 from .user import User
-from enum import Enum as PyEnum
 from .category import CategoryNameEnum
-from typing import List
 
 
 # Role Enum 클래스 정의
@@ -29,8 +29,10 @@ class Chat(Base):
     role: Mapped[str] = mapped_column(Enum(RoleEnum, name="role_enums"), nullable=False)
     chat_content: Mapped[str] = mapped_column(Text, nullable=False)
 
-    __table_args__ = ForeignKeyConstraint(
-        ["user_id", "storage_id"], ["storages.user_id", "storages.id"]
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "storage_id"], ["storages.user_id", "storages.id"]
+        ),
     )
 
     # Chat → User, Storage, Function (N:1 관계)
