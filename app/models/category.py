@@ -11,12 +11,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from .base import Base
-from .evaluation import ComprehensiveEvaluation
-from .user import User
 from enum import Enum as PyEnum
-from .evaluation import RecommendedChallenge, MonthlyAchievement
 from typing import List
+from .base import Base
+from .user import User
 
 
 #  CategoryNameEnum 클래스 정의
@@ -50,22 +48,29 @@ class CategoryProgress(Base):
     user: Mapped["User"] = relationship("User", back_populates="category_progresses")
 
     # CategoryProgress → ComprehensiveEvaluation, RecommendedChallenge, Goal, MonthlyAchievement (1 : N 관계)
-    comprehensive_evaluations: Mapped[List["ComprehensiveEvaluation"]] = relationship(
-        "ComprehensiveEvaluation",
+    comprehensive_evaluations: Mapped[
+        List["app.models.evaluation.ComprehensiveEvaluation"]
+    ] = relationship(
+        "app.models.evaluation.ComprehensiveEvaluation",
         back_populates="category_progress",
         cascade="all, delete",
     )
-    recommended_challenges: Mapped[List["RecommendedChallenge"]] = relationship(
-        "RecommendedChallenge",
+    recommended_challenges: Mapped[
+        List["app.models.evaluation.RecommendedChallenge"]
+    ] = relationship(
+        "app.models.evaluation.RecommendedChallenge",
         back_populates="category_progress",
         cascade="all, delete",
     )
     goals: Mapped[List["Goal"]] = relationship(
         "Goal", back_populates="category_progress", cascade="all, delete"
     )
-
-    monthly_achievement: Mapped["MonthlyAchievement"] = relationship(
-        "MonthlyAchievement", back_populates="category_progress", cascade="all, delete"
+    monthly_achievement: Mapped["app.models.evaluation.MonthlyAchievement"] = (
+        relationship(
+            "app.models.evaluation.MonthlyAchievement",
+            back_populates="category_progress",
+            cascade="all, delete",
+        )
     )
 
 
