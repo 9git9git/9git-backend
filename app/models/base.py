@@ -1,5 +1,5 @@
 # `func`을 추가하여 SQL 기본 함수 활용
-from sqlalchemy import DateTime, func
+from sqlalchemy import DateTime, func, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
@@ -15,6 +15,8 @@ class Base(DeclarativeBase):
     """Base class which provides automated table name
     and surrogate primary key column.
     """
+
+    metadata = MetaData()
 
     id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid4
