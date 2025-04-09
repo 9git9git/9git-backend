@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.base import ResponseBase
 from app.services.user import (
     select_users,
     select_user_by_id,
@@ -15,57 +16,93 @@ from uuid import UUID
 router = APIRouter()
 
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/", response_model=ResponseBase[List[UserResponse]])
 async def get_users(
     db: AsyncSession = Depends(get_db),
-) -> List[UserResponse]:
-
+) -> ResponseBase[List[UserResponse]]:
     try:
-        return await select_users(db)
+        users = await select_users(db)
+        return ResponseBase(status_code=status.HTTP_200_OK, data=users)
+    # crud 에서 발생시키는 HTTPException 에러를 캐치하기 위함
+    except HTTPException as e:
+        return ResponseBase(status_code=e.status_code, error=e.detail)
+    # 일반 예외 처리 ex) db 끊김
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=ResponseBase[UserResponse])
 async def get_user_by_id(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
-) -> UserResponse:
+) -> ResponseBase[UserResponse]:
     try:
-        return await select_user_by_id(db, user_id)
+        user = await select_user_by_id(db, user_id)
+        if not user:
+            return ResponseBase(
+                status_code=status.HTTP_404_NOT_FOUND,
+                error="사용자를 찾을 수 없습니다.",
+            )
+        return ResponseBase(status_code=status.HTTP_200_OK, data=user)
+    except HTTPException as e:
+        return ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
 
 
-@router.get("/email/{email}", response_model=UserResponse)
+@router.get("/email/{email}", response_model=ResponseBase[UserResponse])
 async def get_user_by_email(
     email: str,
     db: AsyncSession = Depends(get_db),
-) -> UserResponse:
+) -> ResponseBase[UserResponse]:
     try:
-        return await select_user_by_email(db, email)
+        user = await select_user_by_email(db, email)
+        if not user:
+            return ResponseBase(
+                status_code=status.HTTP_404_NOT_FOUND,
+                error="사용자를 찾을 수 없습니다.",
+            )
+        return ResponseBase(status_code=status.HTTP_200_OK, data=user)
+    except HTTPException as e:
+        return ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
 
 
-@router.put("/{user_id}", response_model=UserResponse)
+@router.put("/{user_id}", response_model=ResponseBase[UserResponse])
 async def put_user_by_id(
     user_id: UUID,
     user_data: UserUpdate,
     db: AsyncSession = Depends(get_db),
-) -> UserResponse:
+) -> ResponseBase[UserResponse]:
     try:
-        return await update_user_by_id(db, user_id, user_data)
+        user = await update_user_by_id(db, user_id, user_data)
+        return ResponseBase(status_code=status.HTTP_200_OK, data=user)
+    except HTTPException as e:
+        return ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
 
 
-@router.delete("/{user_id}", response_model=bool)
+@router.delete("/{user_id}", response_model=ResponseBase[bool])
 async def delete_user(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
-) -> bool:
+) -> ResponseBase[bool]:
     try:
-        return await delete_user_by_id(db, user_id)
+        result = await delete_user_by_id(db, user_id)
+        return ResponseBase(status_code=status.HTTP_200_OK, data=result)
+    except HTTPException as e:
+        return ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
