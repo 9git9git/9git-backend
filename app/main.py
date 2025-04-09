@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from loguru import logger
 from app.core.logging import setup_logging
 from app.db.base import init_db
+from app.api.v1.router import router as api_router
 import asyncio
 
 
@@ -33,3 +34,6 @@ app = FastAPI(
 @app.get("/")
 async def health_check():
     return {"message": "OK"}
+
+
+app.include_router(api_router, prefix="/api/v1")
