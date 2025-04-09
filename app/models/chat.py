@@ -1,5 +1,5 @@
-from sqlalchemy import String, Text, Enum, ForeignKey, ForeignKeyConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Text, Enum, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign
 from uuid import UUID
 from enum import Enum as PyEnum
 from typing import List
@@ -29,15 +29,12 @@ class Chat(Base):
     role: Mapped[str] = mapped_column(Enum(RoleEnum, name="role_enums"), nullable=False)
     chat_content: Mapped[str] = mapped_column(Text, nullable=False)
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_id", "storage_id"], ["storages.user_id", "storages.id"]
-        ),
-    )
-
     # Chat → User, Storage, Function (N:1 관계)
     user: Mapped["User"] = relationship("User", back_populates="chats")
+
+    # 단일 FK 지정 → foreign_keys 필요 없음
     storage: Mapped["Storage"] = relationship("Storage", back_populates="chats")
+
     function: Mapped["Function"] = relationship("Function", back_populates="chats")
 
 
@@ -61,7 +58,10 @@ class Storage(Base):
 
     # Storage → Chat (1:N 관계)
     chats: Mapped[List["Chat"]] = relationship(
-        "Chat", back_populates="storage", cascade="all, delete"
+        "Chat",
+        back_populates="storage",
+        cascade="all, delete",
+        foreign_keys="Chat.storage_id",
     )
 
 

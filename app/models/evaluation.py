@@ -6,7 +6,6 @@ from sqlalchemy import (
     ForeignKey,
     Date,
     Enum,
-    ForeignKeyConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
@@ -36,9 +35,7 @@ class RecommendedChallenge(Base):
     progress_id: Mapped[UUID] = mapped_column(
         ForeignKey("category_progresses.id"), nullable=False
     )
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id"), nullable=False
-    )  # CategoryProgresses클래스의 user_id 참조
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
@@ -50,31 +47,25 @@ class RecommendedChallenge(Base):
     challenge_difficulty: Mapped[str] = mapped_column(String(20))
     challenge_suggestion: Mapped[str] = mapped_column(Text)
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["progress_id", "user_id", "category_name"],
-            [
-                "category_progresses.id",
-                "category_progresses.user_id",
-                "category_progresses.category_name",
-            ],
-        ),
-    )
-
     # RecommendedChallenge → CategoryProgress (N:1 관계)
     category_progress: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="recommended_challenges"
+        "CategoryProgress",
+        back_populates="recommended_challenges",
+        foreign_keys="RecommendedChallenge.progress_id",
     )
 
 
-# ComprehensiveEvaluation 테이블 (종합 평가)
 class ComprehensiveEvaluation(Base):
     __tablename__ = "comprehensive_evaluations"
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     progress_id: Mapped[UUID] = mapped_column(
         ForeignKey("category_progresses.id"), nullable=False
     )
+    category_progress: Mapped["CategoryProgress"] = relationship(
+        "CategoryProgress", back_populates="comprehensive_evaluations"
+    )
+
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
     )
@@ -94,25 +85,20 @@ class ComprehensiveEvaluation(Base):
     )
     improvement_text: Mapped[str] = mapped_column(Text)
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_id", "progress_id"],
-            ["category_progresses.user_id", "category_progresses.id"],
-        ),
-    )
-
-    # ComprehensiveEvaluation → User, MonthlyAchievement, CategoryProgress (N:1 관계)
     user: Mapped["User"] = relationship(
         "User", back_populates="comprehensive_evaluations"
     )
-    category_progress: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="comprehensive_evaluations"
-    )
 
 
-# MonthlyAchievement 테이블 (월간 성취)
 class MonthlyAchievement(Base):
     __tablename__ = "monthly_achievements"
+
+    progress_id: Mapped[UUID] = mapped_column(
+        ForeignKey("category_progresses.id"), nullable=False
+    )
+    category_progress: Mapped["CategoryProgress"] = relationship(
+        "CategoryProgress", back_populates="monthly_achievements"
+    )
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
@@ -124,14 +110,5 @@ class MonthlyAchievement(Base):
     progress_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
     )
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_id", "category_name"],
-            ["category_progresses.user_id", "category_progresses.category_name"],
-        ),
-    )
-    # MonthlyAchievement → User, CategoryProgress (N:1 관계)
+
     user: Mapped["User"] = relationship("User", back_populates="monthly_achievements")
-    category_progress: Mapped[List["CategoryProgress"]] = relationship(
-        "CategoryProgress", back_populates="monthly_achievements"
-    )
