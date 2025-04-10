@@ -61,9 +61,6 @@ class ComprehensiveEvaluation(Base):
     progress_id: Mapped[UUID] = mapped_column(
         ForeignKey("category_progresses.id"), nullable=False
     )
-    category_progress: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="comprehensive_evaluations"
-    )
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
@@ -88,6 +85,9 @@ class ComprehensiveEvaluation(Base):
     user: Mapped["User"] = relationship(
         "User", back_populates="comprehensive_evaluations"
     )
+    category_progress: Mapped["CategoryProgress"] = relationship(
+        "CategoryProgress", back_populates="comprehensive_evaluations"
+    )
 
 
 class MonthlyAchievement(Base):
@@ -95,9 +95,6 @@ class MonthlyAchievement(Base):
 
     progress_id: Mapped[UUID] = mapped_column(
         ForeignKey("category_progresses.id"), nullable=False
-    )
-    category_progress: Mapped["CategoryProgress"] = relationship(
-        "CategoryProgress", back_populates="monthly_achievements"
     )
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
@@ -112,3 +109,6 @@ class MonthlyAchievement(Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="monthly_achievements")
+    category_progress: Mapped["CategoryProgress"] = relationship(
+        "CategoryProgress", back_populates="monthly_achievements"
+    )
