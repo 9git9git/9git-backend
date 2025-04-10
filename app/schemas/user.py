@@ -30,18 +30,3 @@ class UserUpdate(BaseModel):
     level: int
     exp: int
     character_count: int
-
-
-class CharacterResponse(BaseModel):
-    id: UUID
-    character_name: str
-    level: int
-    image_link: str
-
-
-class UserCharacterResponse(BaseModel):
-    id: UUID
-    user_id: UUID
-    character_id: UUID
-    character: Optional[CharacterResponse] = None
-    user: Optional[UserResponse] = None
