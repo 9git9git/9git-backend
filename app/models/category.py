@@ -10,7 +10,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from typing import List
+from typing import List, Optional
 from .base import Base
 from .user import User
 from app.enum.category import CategoryNameEnum, CategoryColorEnum
@@ -27,36 +27,42 @@ class CategoryProgress(Base):
 
     total_goal: Mapped[int] = mapped_column(Integer, nullable=False)
     completed_goal: Mapped[int] = mapped_column(Integer, nullable=False)
-    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
+    progress_rate: Mapped[Optional[DECIMAL]] = mapped_column(
+        DECIMAL(5, 2), default=0.00
+    )
 
     # CategoryProgress → User (N : 1 관계)
     user: Mapped["User"] = relationship("User", back_populates="category_progresses")
 
     # CategoryProgress → ComprehensiveEvaluation, RecommendedChallenge, Goal, MonthlyAchievement (1 : N 관계)
+
     comprehensive_evaluations: Mapped[
-        List["app.models.evaluation.ComprehensiveEvaluation"]
+        Optional[List["app.models.evaluation.ComprehensiveEvaluation"]]
     ] = relationship(
         "app.models.evaluation.ComprehensiveEvaluation",
         back_populates="category_progress",
         cascade="all, delete",
     )
+
     recommended_challenges: Mapped[
-        List["app.models.evaluation.RecommendedChallenge"]
+        Optional[List["app.models.evaluation.RecommendedChallenge"]]
     ] = relationship(
         "app.models.evaluation.RecommendedChallenge",
         back_populates="category_progress",
         cascade="all, delete",
         foreign_keys="[app.models.evaluation.RecommendedChallenge.progress_id]",  # 추가
     )
-    goals: Mapped[List["Goal"]] = relationship(
+
+    goals: Mapped[Optional[List["Goal"]]] = relationship(
         "Goal", back_populates="category_progress", cascade="all, delete"
     )
-    monthly_achievements: Mapped[List["app.models.evaluation.MonthlyAchievement"]] = (
-        relationship(
-            "app.models.evaluation.MonthlyAchievement",
-            back_populates="category_progress",
-            cascade="all, delete",
-        )
+
+    monthly_achievements: Mapped[
+        Optional[List["app.models.evaluation.MonthlyAchievement"]]
+    ] = relationship(
+        "app.models.evaluation.MonthlyAchievement",
+        back_populates="category_progress",
+        cascade="all, delete",
     )
 
 
@@ -82,7 +88,7 @@ class Goal(Base):
     is_repeat: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="goals")
-    category_progress: Mapped["CategoryProgress"] = relationship(
+    category_progress: Mapped[Optional["CategoryProgress"]] = relationship(
         "CategoryProgress", back_populates="goals"
     )
 
