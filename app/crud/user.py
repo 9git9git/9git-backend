@@ -2,26 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
-from app.models.user import User, GenderEnum
+from app.models.user import User
 from uuid import UUID
 from typing import Optional, List
-
-
-async def read_user_by_id(db: AsyncSession, user_id: UUID) -> Optional[UserResponse]:
-    result = await db.execute(select(User).where(User.id == user_id))
-    return result.scalars().first()
-
-
-async def read_user_by_email(db: AsyncSession, email: str) -> Optional[UserResponse]:
-    result = await db.execute(select(User).where(User.email == email))
-    return result.scalars().first()
-
-
-async def read_users(
-    db: AsyncSession,
-) -> List[UserResponse]:
-    result = await db.execute(select(User))
-    return result.scalars().all()
 
 
 async def create_user(db: AsyncSession, user_data: UserCreate) -> UserResponse:
@@ -35,11 +18,28 @@ async def create_user(db: AsyncSession, user_data: UserCreate) -> UserResponse:
         password=user_data.password,
     )
 
-    await db.add(db_user)
+    db.add(db_user)
     await db.commit()
     await db.refresh(db_user)
 
     return db_user
+
+
+async def read_users(
+    db: AsyncSession,
+) -> List[UserResponse]:
+    result = await db.execute(select(User))
+    return result.scalars().all()
+
+
+async def read_user_by_id(db: AsyncSession, user_id: UUID) -> Optional[UserResponse]:
+    result = await db.execute(select(User).where(User.id == user_id))
+    return result.scalars().first()
+
+
+async def read_user_by_email(db: AsyncSession, email: str) -> Optional[UserResponse]:
+    result = await db.execute(select(User).where(User.email == email))
+    return result.scalars().first()
 
 
 async def update_user(
@@ -51,14 +51,6 @@ async def update_user(
 
     # Pydantic 모델을 딕셔너리로 변환
     update_data = user_data.model_dump()
-
-    # 'sex' 필드가 있으면 실제 Enum 인스턴스로 변환
-    if "sex" in update_data and update_data["sex"] is not None:
-        gender_map = {
-            "M": GenderEnum.MALE,
-            "F": GenderEnum.FEMALE,
-        }
-        update_data["sex"] = gender_map[update_data["sex"]]
 
     # 모델 속성 업데이트
     for key, value in update_data.items():
