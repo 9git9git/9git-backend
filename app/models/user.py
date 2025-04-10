@@ -18,7 +18,7 @@ class User(Base):
 
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    password: Mapped[str] = mapped_column(String(255))
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
     sex: Mapped[Optional[GenderEnum]] = mapped_column(
         Enum(GenderEnum, name="gender_enum")
     )
