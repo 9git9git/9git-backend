@@ -10,22 +10,10 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from typing import List
-from enum import Enum as PyEnum
 from .base import Base
 from .user import User
 from .category import CategoryProgress, CategoryNameEnum
-
-
-class StrengthCategoryEnum(PyEnum):
-    CODING = "코딩"
-    ENGLISH = "영어"
-    EXERCISE = "운동"
-
-
-class ImprovementCategoryEnum(PyEnum):
-    CODING = "코딩"
-    ENGLISH = "영어"
-    EXERCISE = "운동"
+from app.enum.evaluation import StrengthCategoryEnum, ImprovementCategoryEnum
 
 
 # RecommendedChallenge 테이블 (추천 챌린지)

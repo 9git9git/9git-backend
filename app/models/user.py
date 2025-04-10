@@ -1,15 +1,9 @@
 from sqlalchemy import String, Integer, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from enum import Enum as PyEnum
 from typing import List, Optional
 from .base import Base
-
-
-# 성별 Enum 클래스
-class GenderEnum(PyEnum):
-    MALE = "M"
-    FEMALE = "F"
+from app.enum.user import GenderEnum
 
 
 # User 테이블

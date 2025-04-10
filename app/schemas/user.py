@@ -1,13 +1,8 @@
 from pydantic import EmailStr
-from enum import Enum
 from uuid import UUID
 from typing import Optional
 from app.schemas.base import BaseModel
-
-
-class GenderEnum(str, Enum):
-    MALE = "M"
-    FEMALE = "F"
+from app.enum.user import GenderEnum
 
 
 class UserCreate(BaseModel):

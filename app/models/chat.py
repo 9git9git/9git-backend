@@ -1,17 +1,11 @@
 from sqlalchemy import String, Text, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign
 from uuid import UUID
-from enum import Enum as PyEnum
 from typing import List
 from .base import Base
 from .user import User
 from .category import CategoryNameEnum
-
-
-# Role Enum 클래스 정의
-class RoleEnum(PyEnum):
-    QUESTION = "question"
-    ANSWER = "answer"
+from app.enum.chat import RoleEnum
 
 
 # Chat 테이블 (채팅 기록)

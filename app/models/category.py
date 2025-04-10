@@ -10,24 +10,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from enum import Enum as PyEnum
 from typing import List
 from .base import Base
 from .user import User
-
-
-#  CategoryNameEnum 클래스 정의
-class CategoryNameEnum(PyEnum):
-    CODING = "코딩"
-    ENGLISH = "영어"
-    EXERCISE = "운동"
-
-
-# CategoryColorEnum 클래스 정의
-class CategoryColorEnum(PyEnum):
-    CODING = "#FDA63A"  # 호박색
-    ENGLISH = "#6C88C4"  # 인디고 블루
-    EXERCISE = "#556B2F"  # 올리브 그린
+from app.enum.category import CategoryNameEnum, CategoryColorEnum
 
 
 # CategoryProgress 테이블 (한 카테고리에 여러 목표, 노트가 연결됨)
