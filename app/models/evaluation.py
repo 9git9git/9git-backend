@@ -46,11 +46,10 @@ class RecommendedChallenge(Base):
 class ComprehensiveEvaluation(Base):
     __tablename__ = "comprehensive_evaluations"
 
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     progress_id: Mapped[UUID] = mapped_column(
         ForeignKey("category_progresses.id"), nullable=False
     )
-
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
     )
