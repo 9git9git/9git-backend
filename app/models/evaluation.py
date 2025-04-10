@@ -77,24 +77,41 @@ class ComprehensiveEvaluation(Base):
     )
 
 
+from sqlalchemy import String, Integer, DECIMAL, ForeignKey, Date, Enum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from uuid import UUID
+from typing import Optional
+from app.models.base import Base
+from app.enum.category import CategoryNameEnum
+from app.models.user import User
+from app.models.category import CategoryProgress
+
+
 class MonthlyAchievement(Base):
     __tablename__ = "monthly_achievements"
 
+    # 외래키 필드
     progress_id: Mapped[UUID] = mapped_column(
         ForeignKey("category_progresses.id"), nullable=False
     )
-
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
     )
+
+    # 날짜 필드
     month_year: Mapped[Date] = mapped_column(Date, nullable=False)
-    total_goal: Mapped[int] = mapped_column(Integer, nullable=False)
-    completed_goal: Mapped[int] = mapped_column(Integer, nullable=False)
-    progress_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00, nullable=False
+
+    # 목표 필드들 → Optional 처리 (nullable=True)
+    total_goal: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, default=0)
+    completed_goal: Mapped[Optional[int]] = mapped_column(
+        Integer, nullable=True, default=0
+    )
+    progress_rate: Mapped[Optional[DECIMAL]] = mapped_column(
+        DECIMAL(5, 2), nullable=True, default=0.00
     )
 
+    # 관계 설정
     user: Mapped["User"] = relationship("User", back_populates="monthly_achievements")
     category_progress: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress", back_populates="monthly_achievements"
