@@ -7,28 +7,13 @@ from sqlalchemy import (
     DECIMAL,
     ForeignKey,
     Enum,
-    ForeignKeyConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from enum import Enum as PyEnum
 from typing import List
 from .base import Base
 from .user import User
-
-
-#  CategoryNameEnum 클래스 정의
-class CategoryNameEnum(PyEnum):
-    CODING = "코딩"
-    ENGLISH = "영어"
-    EXERCISE = "운동"
-
-
-# CategoryColorEnum 클래스 정의
-class CategoryColorEnum(PyEnum):
-    CODING = "#FDA63A"  # 호박색
-    ENGLISH = "#6C88C4"  # 인디고 블루
-    EXERCISE = "#556B2F"  # 올리브 그린
+from app.enum.category import CategoryNameEnum, CategoryColorEnum
 
 
 # CategoryProgress 테이블 (한 카테고리에 여러 목표, 노트가 연결됨)
@@ -61,6 +46,7 @@ class CategoryProgress(Base):
         "app.models.evaluation.RecommendedChallenge",
         back_populates="category_progress",
         cascade="all, delete",
+        foreign_keys="[app.models.evaluation.RecommendedChallenge.progress_id]",  # 추가
     )
     goals: Mapped[List["Goal"]] = relationship(
         "Goal", back_populates="category_progress", cascade="all, delete"
@@ -78,6 +64,10 @@ class CategoryProgress(Base):
 class Goal(Base):
     __tablename__ = "goals"
 
+    progress_id: Mapped[UUID] = mapped_column(
+        ForeignKey("category_progresses.id"), nullable=False
+    )
+
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     category_name: Mapped[CategoryNameEnum] = mapped_column(
         Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
@@ -91,14 +81,6 @@ class Goal(Base):
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     is_repeat: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_id", "category_name"],
-            ["category_progresses.user_id", "category_progresses.category_name"],
-        ),
-    )
-
-    # Goal → User, CategoryProgresses (N : 1 관계)
     user: Mapped["User"] = relationship("User", back_populates="goals")
     category_progress: Mapped["CategoryProgress"] = relationship(
         "CategoryProgress", back_populates="goals"

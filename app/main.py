@@ -4,7 +4,9 @@ from contextlib import asynccontextmanager
 from loguru import logger
 from app.core.logging import setup_logging
 from app.db.base import init_db
+from app.api.v1.router import router as api_router
 import asyncio
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -29,7 +31,22 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+allow_origins = [
+    "http://localhost:3000",
+    # TODO: 추후 프론트 배포 url 추가 필요
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allow_origins,  # 모든 출처 허용 (배포 환경에서는 특정 도메인으로 제한하는 것이 좋습니다)
+    allow_credentials=True,
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용
+    allow_headers=["*"],  # 모든 헤더 허용
+)
+
 
 @app.get("/")
 async def health_check():
     return {"message": "OK"}
+
+
+app.include_router(api_router, prefix="/api/v1")
