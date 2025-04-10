@@ -54,7 +54,7 @@ async def get_user_by_id(
         )
 
 
-@router.get("/email/{email}", response_model=ResponseBase[UserResponse])
+@router.get("/emails/{email}", response_model=ResponseBase[UserResponse])
 async def get_user_by_email(
     email: str,
     db: AsyncSession = Depends(get_db),
