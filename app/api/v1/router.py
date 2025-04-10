@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     memo,
     category,
     storage,
+    recommended_challenge,
 )
 
 router = APIRouter()
@@ -33,4 +34,9 @@ router.include_router(
     storage.router,
     prefix="/users/{user_id}/categories/{category_id}/storages",
     tags=["storages"],
+)
+router.include_router(
+    recommended_challenge.router,
+    prefix="/users/{user_id}/categories/{category_id}/recommend-challenges",
+    tags=["RecommendedChallenges"],
 )
