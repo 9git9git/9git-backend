@@ -1,8 +1,9 @@
-from sqlalchemy import String, Text, ForeignKey
+from sqlalchemy import String, Text, ForeignKey, Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from typing import List, Optional
 from .base import Base
+from app.enum.chat import RoleEnum
 
 
 # ✅ Chat 테이블: 챗봇 또는 사용자 간 대화 기록 저장
