@@ -6,7 +6,7 @@ from .base import Base
 from app.enum.user import GenderEnum
 
 
-# User 테이블
+# User 테이블 (회원 정보)
 class User(Base):
     __tablename__ = "users"
 
@@ -22,28 +22,39 @@ class User(Base):
     exp: Mapped[Optional[int]] = mapped_column(Integer, default=0)
     character_count: Mapped[Optional[int]] = mapped_column(Integer, default=0)
 
-    # User → UserCharacter, Goal, TodayNote, CategoryProgress, Chat, Storage, ComprehensiveEvaluation, MonthlyAchievement (1:N 관계)
+    # 관계 설정 (1:N)
     user_characters: Mapped[Optional[List["UserCharacter"]]] = relationship(
         "UserCharacter", back_populates="user", cascade="all, delete"
     )
-    goals: Mapped[Optional[List["app.models.category.Goal"]]] = relationship(
-        "app.models.category.Goal", back_populates="user", cascade="all, delete"
-    )
-    today_notes: Mapped[Optional[List["app.models.category.TodayNote"]]] = relationship(
-        "app.models.category.TodayNote", back_populates="user", cascade="all, delete"
-    )
-    category_progresses: Mapped[
-        Optional[List["app.models.category.CategoryProgress"]]
-    ] = relationship(
-        "app.models.category.CategoryProgress",
+    todos: Mapped[Optional[List["app.models.category.Todo"]]] = relationship(
+        "app.models.category.Todo",
         back_populates="user",
         cascade="all, delete",
+        foreign_keys="app.models.category.Todo.user_id",
+    )
+    memos: Mapped[Optional[List["app.models.category.Memo"]]] = relationship(
+        "app.models.category.Memo",
+        back_populates="user",
+        cascade="all, delete",
+        foreign_keys="app.models.category.Memo.user_id",
+    )
+    progresses: Mapped[Optional[List["app.models.category.Progress"]]] = relationship(
+        "app.models.category.Progress",
+        back_populates="user",
+        cascade="all, delete",
+        foreign_keys="app.models.category.Progress.user_id",
     )
     chats: Mapped[Optional[List["app.models.chat.Chat"]]] = relationship(
-        "app.models.chat.Chat", back_populates="user", cascade="all, delete"
+        "app.models.chat.Chat",
+        back_populates="user",
+        cascade="all, delete",
+        foreign_keys="app.models.chat.Chat.user_id",
     )
     storages: Mapped[Optional[List["app.models.chat.Storage"]]] = relationship(
-        "app.models.chat.Storage", back_populates="user", cascade="all, delete"
+        "app.models.chat.Storage",
+        back_populates="user",
+        cascade="all, delete",
+        foreign_keys="app.models.chat.Storage.user_id",
     )
     comprehensive_evaluations: Mapped[
         Optional[List["app.models.evaluation.ComprehensiveEvaluation"]]
@@ -51,17 +62,19 @@ class User(Base):
         "app.models.evaluation.ComprehensiveEvaluation",
         back_populates="user",
         cascade="all, delete",
+        foreign_keys="app.models.evaluation.ComprehensiveEvaluation.user_id",
     )
-    monthly_achievements: Mapped[
-        Optional[List["app.models.evaluation.MonthlyAchievement"]]
+    recommended_challenges: Mapped[
+        Optional[List["app.models.evaluation.RecommendedChallenge"]]
     ] = relationship(
-        "app.models.evaluation.MonthlyAchievement",
+        "app.models.evaluation.RecommendedChallenge",
         back_populates="user",
         cascade="all, delete",
+        foreign_keys="app.models.evaluation.RecommendedChallenge.user_id",
     )
 
 
-# UserCharacter 테이블
+# UserCharacter 테이블 (사용자-캐릭터 연결 테이블)
 class UserCharacter(Base):
     __tablename__ = "user_characters"
 
@@ -70,14 +83,18 @@ class UserCharacter(Base):
         ForeignKey("characters.id"), nullable=False
     )
 
-    # UserCharacter → User, Character (N:1 관계)
-    user: Mapped["User"] = relationship("User", back_populates="user_characters")
+    #   관계설정 N : 1
+    user: Mapped["User"] = relationship(
+        "User", back_populates="user_characters", foreign_keys="UserCharacter.user_id"
+    )
     character: Mapped["Character"] = relationship(
-        "Character", back_populates="user_characters"
+        "Character",
+        back_populates="user_characters",
+        foreign_keys="UserCharacter.character_id",
     )
 
 
-# Character 테이블
+# Character 테이블 (캐릭터 정보)
 class Character(Base):
     __tablename__ = "characters"
 
@@ -85,7 +102,7 @@ class Character(Base):
     level: Mapped[int] = mapped_column(Integer, nullable=False)
     image_link: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # Character → UserCharacter (1:N 관계)
+    # 관계설정 1 : N
     user_characters: Mapped[Optional[List["UserCharacter"]]] = relationship(
         "UserCharacter", back_populates="character", cascade="all, delete"
     )
