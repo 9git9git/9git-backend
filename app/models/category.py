@@ -47,9 +47,7 @@ class Progress(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-    progress_rate: Mapped[Optional[DECIMAL]] = mapped_column(
-        DECIMAL(5, 2), default=0.00
-    )
+    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
 
@@ -79,8 +77,8 @@ class Todo(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
-    is_completed: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
-    is_repeat: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_repeat: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # 관계: Todo N : 1 User / Category
     user: Mapped["app.models.user.User"] = relationship(

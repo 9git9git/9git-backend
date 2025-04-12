@@ -47,15 +47,15 @@ class ComprehensiveEvaluation(Base):
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
     )
-    evaluation_text: Mapped[str] = mapped_column(Text)
+    evaluation_text: Mapped[Optional[str]] = mapped_column(Text)
     strength_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
     )
-    strength_text: Mapped[str] = mapped_column(Text)
+    strength_text: Mapped[Optional[str]] = mapped_column(Text)
     improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(
         DECIMAL(5, 2), default=0.00, nullable=False
     )
-    improvement_text: Mapped[str] = mapped_column(Text)
+    improvement_text: Mapped[Optional[str]] = mapped_column(Text)
 
     # 관계: ComprehensiveEvaluation N : 1 User
     user: Mapped["app.models.user.User"] = relationship(
