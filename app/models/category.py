@@ -1,45 +1,45 @@
-# category.py (ERD 기반 주석 및 관계 FK 명시)
-from sqlalchemy import (
-    String,
-    Boolean,
-    Integer,
-    Text,
-    Date,
-    DECIMAL,
-    ForeignKey,
-)
+from sqlalchemy import String, Boolean, Text, Date, DECIMAL, Enum as SqlEnum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from typing import List
+from typing import List, Optional
 from .base import Base
-from .user import User
-from .week import Week
 from app.enum.category import CategoryNameEnum, CategoryColorEnum
+from app.enum.week import WeekdayEnum
+from app.enum.user import GenderEnum
 
 
-# Category 테이블 (카테고리 이름 및 색상)
+# ✅ Category 테이블: 사용자의 카테고리를 정의 (코딩/영어/운동 등)
 class Category(Base):
     __tablename__ = "categories"
 
     category_name: Mapped[CategoryNameEnum] = mapped_column(nullable=False)
     category_color: Mapped[CategoryColorEnum] = mapped_column(nullable=False)
 
-    # 관계: Progress, Todo, Memo, Storage와 연결됨 1 : N
-    progresses: Mapped[List["Progress"]] = relationship(
-        "Progress", back_populates="category", cascade="all, delete"
+    # 관계: Category 1 : 1 Progress
+    progress: Mapped[Optional["app.models.category.Progress"]] = relationship(
+        "app.models.category.Progress", back_populates="category", cascade="all, delete"
     )
-    todos: Mapped[List["Todo"]] = relationship(
-        "Todo", back_populates="category", cascade="all, delete"
+
+    # 관계: Category 1 : N Todo, Memo, Storage, RecommendedChallenge
+    todos: Mapped[Optional[List["app.models.category.Todo"]]] = relationship(
+        "app.models.category.Todo", back_populates="category", cascade="all, delete"
     )
-    memos: Mapped[List["Memo"]] = relationship(
-        "Memo", back_populates="category", cascade="all, delete"
+    memos: Mapped[Optional[List["app.models.category.Memo"]]] = relationship(
+        "app.models.category.Memo", back_populates="category", cascade="all, delete"
     )
-    storages: Mapped[List["Storage"]] = relationship(
-        "Storage", back_populates="category", cascade="all, delete"
+    storages: Mapped[Optional[List["app.models.chat.Storage"]]] = relationship(
+        "app.models.chat.Storage", back_populates="category", cascade="all, delete"
+    )
+    recommended_challenges: Mapped[
+        Optional[List["app.models.evaluation.RecommendedChallenge"]]
+    ] = relationship(
+        "app.models.evaluation.RecommendedChallenge",
+        back_populates="category",
+        cascade="all, delete",
     )
 
 
-# Progress 테이블 (카테고리 별 진행률)
+# ✅ Progress 테이블: 카테고리별 목표 진행률 저장 테이블
 class Progress(Base):
     __tablename__ = "progresses"
 
@@ -47,42 +47,26 @@ class Progress(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
+    progress_rate: Mapped[Optional[DECIMAL]] = mapped_column(
+        DECIMAL(5, 2), default=0.00
+    )
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
 
-    # 관계
-    user: Mapped["User"] = relationship(
-        "User", back_populates="progresses", foreign_keys="Progress.user_id"
+    # 관계: Progress N : 1 User / Category
+    user: Mapped["app.models.user.User"] = relationship(
+        "app.models.user.User",
+        back_populates="progresses",
+        foreign_keys="Progress.user_id",
     )
-    category: Mapped["Category"] = relationship(
-        "Category", back_populates="progresses", foreign_keys="Progress.category_id"
-    )
-    # todos, memos 랑 연결이 필요한가?================================================
-    todos: Mapped[List["Todo"]] = relationship(
-        "Todo", back_populates="progress", cascade="all, delete"
-    )
-    memos: Mapped[List["Memo"]] = relationship(
-        "Memo", back_populates="progress", cascade="all, delete"
-    )
-    # =============================================================================
-    comprehensive_evaluations: Mapped[
-        List["app.models.evaluation.ComprehensiveEvaluation"]
-    ] = relationship(
-        "app.models.evaluation.ComprehensiveEvaluation",
+    category: Mapped[Optional["app.models.category.Category"]] = relationship(
+        "app.models.category.Category",
         back_populates="progress",
-        cascade="all, delete",
-    )
-    recommended_challenges: Mapped[
-        List["app.models.evaluation.RecommendedChallenge"]
-    ] = relationship(
-        "app.models.evaluation.RecommendedChallenge",
-        back_populates="progress",
-        cascade="all, delete",
+        foreign_keys="Progress.category_id",
     )
 
 
-# Todo 테이블 (할 일 관리)
+# ✅ Todo 테이블: 할 일(Task) 기록 테이블
 class Todo(Base):
     __tablename__ = "todos"
 
@@ -90,34 +74,29 @@ class Todo(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-    # Todo인데 progress_id가 필요할까?
-    progress_id: Mapped[UUID] = mapped_column(
-        ForeignKey("progresses.id"), nullable=False
-    )
-    week_id: Mapped[UUID] = mapped_column(ForeignKey("weeks.id"), nullable=False)
+    week_id: Mapped[int] = mapped_column(ForeignKey("weeks.id"), nullable=False)
+
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
-    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
-    is_repeat: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_completed: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
+    is_repeat: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
 
-    # 관계
-    user: Mapped["User"] = relationship(
-        "User", back_populates="todos", foreign_keys="Todo.user_id"
+    # 관계: Todo N : 1 User / Category / Week
+    user: Mapped["app.models.user.User"] = relationship(
+        "app.models.user.User", back_populates="todos", foreign_keys="Todo.user_id"
     )
-    category: Mapped["Category"] = relationship(
-        "Category", back_populates="todos", foreign_keys="Todo.category_id"
+    category: Mapped[Optional["app.models.category.Category"]] = relationship(
+        "app.models.category.Category",
+        back_populates="todos",
+        foreign_keys="Todo.category_id",
     )
-    # 필요 한가?
-    progress: Mapped["Progress"] = relationship(
-        "Progress", back_populates="todos", foreign_keys="Todo.progress_id"
-    )
-    week: Mapped["Week"] = relationship(
-        "Week", back_populates="todos", foreign_keys="Todo.week_id"
+    week: Mapped[Optional["app.models.week.Week"]] = relationship(
+        "app.models.week.Week", back_populates="todos", foreign_keys="Todo.week_id"
     )
 
 
-# Memo 테이블 (메모/노트)
+# ✅ Memo 테이블: 사용자 개인 메모 및 노트 저장 테이블
 class Memo(Base):
     __tablename__ = "memos"
 
@@ -125,23 +104,18 @@ class Memo(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-    # 필요 한가?
-    progress_id: Mapped[UUID] = mapped_column(
-        ForeignKey("progresses.id"), nullable=False
-    )
+
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
 
-    # 관계 N : 1
-    user: Mapped["User"] = relationship(
-        "User", back_populates="memos", foreign_keys="Memo.user_id"
+    # 관계: Memo N : 1 User / Category
+    user: Mapped["app.models.user.User"] = relationship(
+        "app.models.user.User", back_populates="memos", foreign_keys="Memo.user_id"
     )
-    category: Mapped["Category"] = relationship(
-        "Category", back_populates="memos", foreign_keys="Memo.category_id"
-    )
-    # 필요 한가?
-    progress: Mapped["Progress"] = relationship(
-        "Progress", back_populates="memos", foreign_keys="Memo.progress_id"
+    category: Mapped[Optional["app.models.category.Category"]] = relationship(
+        "app.models.category.Category",
+        back_populates="memos",
+        foreign_keys="Memo.category_id",
     )
