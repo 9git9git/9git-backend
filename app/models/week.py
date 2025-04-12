@@ -13,7 +13,7 @@ class Week(Base):
         SqlEnum(WeekdayEnum, name="week_name_enums"), nullable=False
     )
 
-    # 관계: Todo N : 1 Week (하나의 할 일이 하나의 요일을 갖고, 여러 Todo가 같은 요일을 가질 수 있음)
+    # 관계: Week N : 1 Todo (하나의 할 일이 하나의 요일을 갖고, 여러 Todo가 같은 요일을 가질 수 있음)
     todo: Mapped[Optional["app.models.category.Todo"]] = relationship(
         "app.models.category.Todo", back_populates="weeks"
     )
