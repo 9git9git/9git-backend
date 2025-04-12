@@ -1,9 +1,4 @@
-from sqlalchemy import (
-    String,
-    Text,
-    DECIMAL,
-    ForeignKey,
-)
+from sqlalchemy import String, Text, DECIMAL, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from typing import Optional

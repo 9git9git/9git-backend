@@ -1,7 +1,6 @@
 from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from typing import List, Optional
+from typing import Optional
 from .base import Base
 from app.enum.week import WeekdayEnum
 

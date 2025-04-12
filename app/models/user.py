@@ -1,4 +1,4 @@
-from sqlalchemy import String, Enum as SqlEnum, ForeignKey, Integer
+from sqlalchemy import String, Integer, ForeignKey, Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from typing import List, Optional
