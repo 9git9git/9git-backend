@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, Enum, ForeignKey
+from sqlalchemy import String, Enum as SqlEnum, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from typing import List, Optional
@@ -6,7 +6,7 @@ from .base import Base
 from app.enum.user import GenderEnum
 
 
-# User 테이블 (회원 정보)
+# ✅ User 테이블: 사용자 계정 및 기본 프로필 정보
 class User(Base):
     __tablename__ = "users"
 
@@ -14,7 +14,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     sex: Mapped[Optional[GenderEnum]] = mapped_column(
-        Enum(GenderEnum, name="gender_enum")
+        SqlEnum(GenderEnum, name="gender_enum")
     )
     age: Mapped[Optional[int]] = mapped_column(Integer)
     job: Mapped[Optional[str]] = mapped_column(String(100))
@@ -22,9 +22,13 @@ class User(Base):
     exp: Mapped[Optional[int]] = mapped_column(Integer, default=0)
     character_count: Mapped[Optional[int]] = mapped_column(Integer, default=0)
 
-    # 관계 설정 (1:N)
-    user_characters: Mapped[Optional[List["UserCharacter"]]] = relationship(
-        "UserCharacter", back_populates="user", cascade="all, delete"
+    # 관계: User 1 : N 다양한 서브 테이블과 연결
+    user_characters: Mapped[Optional[List["app.models.user.UserCharacter"]]] = (
+        relationship(
+            "app.models.user.UserCharacter",
+            back_populates="user",
+            cascade="all, delete",
+        )
     )
     todos: Mapped[Optional[List["app.models.category.Todo"]]] = relationship(
         "app.models.category.Todo",
@@ -74,7 +78,7 @@ class User(Base):
     )
 
 
-# UserCharacter 테이블 (사용자-캐릭터 연결 테이블)
+# ✅ UserCharacter 테이블: 사용자-캐릭터 연결 다대다 중간 테이블
 class UserCharacter(Base):
     __tablename__ = "user_characters"
 
@@ -83,18 +87,20 @@ class UserCharacter(Base):
         ForeignKey("characters.id"), nullable=False
     )
 
-    #   관계설정 N : 1
-    user: Mapped["User"] = relationship(
-        "User", back_populates="user_characters", foreign_keys="UserCharacter.user_id"
+    # 관계: UserCharacter N : 1 User / Character
+    user: Mapped["app.models.user.User"] = relationship(
+        "app.models.user.User",
+        back_populates="user_characters",
+        foreign_keys="UserCharacter.user_id",
     )
-    character: Mapped["Character"] = relationship(
-        "Character",
+    character: Mapped["app.models.user.Character"] = relationship(
+        "app.models.user.Character",
         back_populates="user_characters",
         foreign_keys="UserCharacter.character_id",
     )
 
 
-# Character 테이블 (캐릭터 정보)
+# ✅ Character 테이블: 유저가 선택 가능한 캐릭터 정보
 class Character(Base):
     __tablename__ = "characters"
 
@@ -102,7 +108,11 @@ class Character(Base):
     level: Mapped[int] = mapped_column(Integer, nullable=False)
     image_link: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # 관계설정 1 : N
-    user_characters: Mapped[Optional[List["UserCharacter"]]] = relationship(
-        "UserCharacter", back_populates="character", cascade="all, delete"
+    # 관계: Character 1 : N UserCharacter (사용자가 보유한 캐릭터 목록)
+    user_characters: Mapped[Optional[List["app.models.user.UserCharacter"]]] = (
+        relationship(
+            "app.models.user.UserCharacter",
+            back_populates="character",
+            cascade="all, delete",
+        )
     )
