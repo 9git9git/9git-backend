@@ -14,9 +14,7 @@ class RecommendedChallenge(Base):
     )
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    progress_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00, nullable=False
-    )
+    progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
     challenge_task: Mapped[str] = mapped_column(Text)
     challenge_duration: Mapped[str] = mapped_column(String(50))
     challenge_difficulty: Mapped[str] = mapped_column(String(20))
@@ -40,15 +38,15 @@ class ComprehensiveEvaluation(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     overall_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00, nullable=False
+        DECIMAL(5, 2), default=0.00
     )
     evaluation_text: Mapped[Optional[str]] = mapped_column(Text)
     strength_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00, nullable=False
+        DECIMAL(5, 2), default=0.00
     )
     strength_text: Mapped[Optional[str]] = mapped_column(Text)
     improvement_achievement_rate: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(5, 2), default=0.00, nullable=False
+        DECIMAL(5, 2), default=0.00
     )
     improvement_text: Mapped[Optional[str]] = mapped_column(Text)
 
