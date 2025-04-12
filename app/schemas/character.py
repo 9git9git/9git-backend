@@ -16,6 +16,6 @@ class CharacterResponse(BaseModel):
 
 
 class CharacterUpdate(BaseModel):
-    character_name: str
+    characterName: str
     level: int
     imageLink: str

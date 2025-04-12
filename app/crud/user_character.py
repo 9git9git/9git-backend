@@ -18,13 +18,13 @@ async def create_user_character(
     db: AsyncSession, user_character_data: UserCharacterCreate
 ) -> UserCharacterResponse:
     if await read_user_character_by_user_id_and_character_id(
-        db, user_character_data.user_id, user_character_data.character_id
+        db, user_character_data.userId, user_character_data.characterId
     ):
         raise HTTPException(status_code=400, detail="이미 소유하고 있는 캐릭터입니다.")
 
     db_user_character = UserCharacter(
-        user_id=user_character_data.user_id,
-        character_id=user_character_data.character_id,
+        user_id=user_character_data.userId,
+        character_id=user_character_data.characterId,
     )
 
     db.add(db_user_character)
@@ -112,7 +112,7 @@ async def update_user_character(
         )
 
     existing = await read_user_character_by_user_id_and_character_id(
-        db, user_character_data.user_id, user_character_data.character_id
+        db, user_character_data.userId, user_character_data.characterId
     )
 
     if existing:
@@ -120,19 +120,19 @@ async def update_user_character(
             status_code=400, detail="이미 해당 유저와 캐릭터 조합이 존재합니다."
         )
 
-    user = await read_user_by_id(db, user_character_data.user_id)
+    user = await read_user_by_id(db, user_character_data.userId)
     if not user:
         raise HTTPException(
             status_code=404,
-            detail=f"해당 유저(ID: {user_character_data.user_id})를 찾을 수 없습니다.",
+            detail=f"해당 유저(ID: {user_character_data.userId})를 찾을 수 없습니다.",
         )
 
     # 해당 character_id가 존재하는지 확인
-    character = await read_character_by_id(db, user_character_data.character_id)
+    character = await read_character_by_id(db, user_character_data.characterId)
     if not character:
         raise HTTPException(
             status_code=404,
-            detail=f"해당 캐릭터(ID: {user_character_data.character_id})를 찾을 수 없습니다.",
+            detail=f"해당 캐릭터(ID: {user_character_data.characterId})를 찾을 수 없습니다.",
         )
 
     # 업데이트 수행

@@ -6,8 +6,8 @@ from typing import Optional
 
 
 class UserCharacterCreate(BaseModel):
-    user_id: UUID
-    character_id: UUID
+    userId: UUID
+    characterId: UUID
 
 
 class UserCharacterResponse(BaseModel):
@@ -19,5 +19,5 @@ class UserCharacterResponse(BaseModel):
 
 
 class UserCharacterUpdate(BaseModel):
-    user_id: UUID
-    character_id: UUID
+    userId: UUID
+    characterId: UUID
