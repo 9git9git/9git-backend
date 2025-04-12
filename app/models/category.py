@@ -1,11 +1,9 @@
-from sqlalchemy import String, Boolean, Text, Date, DECIMAL, Enum as SqlEnum, ForeignKey
+from sqlalchemy import String, Boolean, Text, Date, DECIMAL, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 from typing import List, Optional
 from .base import Base
 from app.enum.category import CategoryNameEnum, CategoryColorEnum
-from app.enum.week import WeekdayEnum
-from app.enum.user import GenderEnum
 
 
 # ✅ Category 테이블: 사용자의 카테고리를 정의 (코딩/영어/운동 등)
@@ -75,7 +73,6 @@ class Todo(Base):
         ForeignKey("categories.id"), nullable=False
     )
     week_id: Mapped[int] = mapped_column(ForeignKey("weeks.id"), nullable=False)
-
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)

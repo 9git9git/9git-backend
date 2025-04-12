@@ -1,8 +1,7 @@
-from sqlalchemy import Enum, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign
+from sqlalchemy import Enum as SqlEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-
-from typing import List
+from typing import List, Optional
 from .base import Base
 from app.enum.week import WeekdayEnum
 
