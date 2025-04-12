@@ -14,8 +14,10 @@ class Category(Base):
     category_color: Mapped[CategoryColorEnum] = mapped_column(nullable=False)
 
     # 관계: Category 1 : 1 Progress
-    progress: Mapped[Optional["app.models.category.Progress"]] = relationship(
-        "app.models.category.Progress", back_populates="category", cascade="all, delete"
+    progress: Mapped["app.models.category.Progress"] = relationship(
+        "app.models.category.Progress",
+        back_populates="category",
+        cascade="all, delete",
     )
 
     # 관계: Category 1 : N Todo, Memo, Storage, RecommendedChallenge
@@ -51,13 +53,14 @@ class Progress(Base):
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
 
-    # 관계: Progress N : 1 User / Category
+    # 관계: Progress N : 1 User
     user: Mapped["app.models.user.User"] = relationship(
         "app.models.user.User",
         back_populates="progresses",
         foreign_keys="Progress.user_id",
     )
-    category: Mapped[Optional["app.models.category.Category"]] = relationship(
+    # 관계: Progress 1 : 1 Category
+    category: Mapped["app.models.category.Category"] = relationship(
         "app.models.category.Category",
         back_populates="progress",
         foreign_keys="Progress.category_id",
@@ -79,7 +82,7 @@ class Todo(Base):
     is_completed: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
     is_repeat: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
 
-    # 관계: Todo N : 1 User / Category / Week
+    # 관계: Todo N : 1 User / Category
     user: Mapped["app.models.user.User"] = relationship(
         "app.models.user.User", back_populates="todos", foreign_keys="Todo.user_id"
     )
@@ -88,8 +91,9 @@ class Todo(Base):
         back_populates="todos",
         foreign_keys="Todo.category_id",
     )
-    week: Mapped[Optional["app.models.week.Week"]] = relationship(
-        "app.models.week.Week", back_populates="todos", foreign_keys="Todo.week_id"
+    # 관계: Todo 1 : N Week
+    weeks: Mapped[Optional[List["app.models.week.Week"]]] = relationship(
+        "app.models.week.Week", back_populates="todo", foreign_keys="Todo.week_id"
     )
 
 

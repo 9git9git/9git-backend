@@ -15,9 +15,9 @@ class Chat(Base):
         ForeignKey("categories.id"), nullable=False
     )
 
-    role: Mapped[str] = mapped_column(
-        String(20), nullable=False
-    )  # 예: 'User', 'Assistant'
+    role: Mapped[RoleEnum] = mapped_column(
+        SqlEnum(RoleEnum, name="role_enum"), nullable=False
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
 
     # 관계: Chat N : 1 User / Storage / Category
