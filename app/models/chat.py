@@ -1,74 +1,58 @@
-from sqlalchemy import String, Text, Enum, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign
+from sqlalchemy import String, Text, ForeignKey, Enum as SqlEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
-from typing import List
+from typing import List, Optional
 from .base import Base
-from .user import User
-from .category import CategoryNameEnum
 from app.enum.chat import RoleEnum
 
 
-# Chat 테이블 (채팅 기록)
+# ✅ Chat 테이블: 챗봇 또는 사용자 간 대화 기록 저장
 class Chat(Base):
     __tablename__ = "chats"
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
     storage_id: Mapped[UUID] = mapped_column(ForeignKey("storages.id"), nullable=False)
-    function_id: Mapped[UUID] = mapped_column(
-        ForeignKey("functions.id"), nullable=False
+    category_id: Mapped[UUID] = mapped_column(
+        ForeignKey("categories.id"), nullable=False
     )
-    category_name: Mapped[CategoryNameEnum] = mapped_column(
-        Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
+
+    role: Mapped[RoleEnum] = mapped_column(
+        SqlEnum(RoleEnum, name="role_enum"), nullable=False
     )
-    role: Mapped[str] = mapped_column(Enum(RoleEnum, name="role_enums"), nullable=False)
-    chat_content: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
 
-    # Chat → User, Storage, Function (N:1 관계)
-    user: Mapped["User"] = relationship("User", back_populates="chats")
+    # 관계: Chat N : 1 User / Storage / Category
+    user: Mapped["app.models.user.User"] = relationship(
+        "app.models.user.User", back_populates="chats"
+    )
+    storage: Mapped[Optional["app.models.chat.Storage"]] = relationship(
+        "app.models.chat.Storage", back_populates="chats"
+    )
+    category: Mapped[Optional["app.models.category.Category"]] = relationship(
+        "app.models.category.Category"
+    )
 
-    # 단일 FK 지정 → foreign_keys 필요 없음
-    storage: Mapped["Storage"] = relationship("Storage", back_populates="chats")
 
-    function: Mapped["Function"] = relationship("Function", back_populates="chats")
-
-
-# Storage 테이블 (저장된 콘텐츠)
+# ✅ Storage 테이블: 저장된 대화/메모/기록을 포함하는 컨테이너 테이블
 class Storage(Base):
     __tablename__ = "storages"
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
-    category_name: Mapped[CategoryNameEnum] = mapped_column(
-        Enum(CategoryNameEnum, name="category_name_enums"), nullable=False
-    )
-    function_id: Mapped[UUID] = mapped_column(
-        ForeignKey("functions.id"), nullable=False
-    )
-    storage_title: Mapped[str] = mapped_column(String(255), nullable=False)
-    storage_description: Mapped[str] = mapped_column(Text)
-
-    # Storage → User, Function (N:1 관계)
-    user: Mapped["User"] = relationship("User", back_populates="storages")
-    function: Mapped["Function"] = relationship("Function", back_populates="storages")
-
-    # Storage → Chat (1:N 관계)
-    chats: Mapped[List["Chat"]] = relationship(
-        "Chat",
-        back_populates="storage",
-        cascade="all, delete",
-        foreign_keys="Chat.storage_id",
+    category_id: Mapped[UUID] = mapped_column(
+        ForeignKey("categories.id"), nullable=False
     )
 
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
 
-# Function 테이블 (함수 API 정보)
-class Function(Base):
-    __tablename__ = "functions"
-
-    function_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    function_description: Mapped[str] = mapped_column(Text)
-    function_api: Mapped[str] = mapped_column(String(255), nullable=False)
-
-    # Function → Storage, Chat (1:N 관계)
-    storages: Mapped[List["Storage"]] = relationship(
-        "Storage", back_populates="function"
+    # 관계: Storage N : 1 User / Category
+    user: Mapped["app.models.user.User"] = relationship(
+        "app.models.user.User", back_populates="storages"
     )
-    chats: Mapped[List["Chat"]] = relationship("Chat", back_populates="function")
+    category: Mapped[Optional["app.models.category.Category"]] = relationship(
+        "app.models.category.Category", back_populates="storages"
+    )
+
+    # 관계: Storage 1 : N Chat
+    chats: Mapped[Optional[List["app.models.chat.Chat"]]] = relationship(
+        "app.models.chat.Chat", back_populates="storage", cascade="all, delete"
+    )

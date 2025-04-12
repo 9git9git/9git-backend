@@ -30,6 +30,7 @@ async def init_db():
     import app.models.category
     import app.models.chat
     import app.models.evaluation
+    import app.models.week
 
     try:
         async with engine.begin() as conn:
