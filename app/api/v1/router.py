@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from app.api.v1.endpoints import (
     auth,
     user,
@@ -7,7 +8,9 @@ from app.api.v1.endpoints import (
     comprehensive_evaluation,
     memo,
     category,
+    storage,
 )
+
 
 router = APIRouter()
 
@@ -28,3 +31,8 @@ router.include_router(
     tags=["memos"],
 )
 router.include_router(category.router, prefix="/categories", tags=["Category"])
+router.include_router(
+    storage.router,
+    prefix="/users/{user_id}/categories/{category_id}/storages",
+    tags=["storages"],
+)
