@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.user import (
     read_users,
@@ -11,7 +11,6 @@ from app.crud.user import (
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from typing import List
 from uuid import UUID
-from fastapi import status
 
 
 async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserResponse:
