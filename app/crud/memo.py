@@ -73,6 +73,24 @@ async def read_memos_by_category_id(
     return db_memo.scalars().all()
 
 
+async def read_memos_by_period_and_category_id(
+    db: AsyncSession,
+    user_id: UUID,
+    category_id: UUID,
+    start_date: datetime,
+    end_date: datetime,
+) -> List[MemoResponse]:
+    db_memo = await db.execute(
+        select(Memo).where(
+            Memo.user_id == user_id,
+            Memo.category_id == category_id,
+            Memo.start_date >= start_date,
+            Memo.end_date <= end_date,
+        )
+    )
+    return db_memo.scalars().all()
+
+
 async def update_memo(
     db: AsyncSession, user_id: UUID, memo_id: UUID, memo_data: MemoUpdate
 ) -> MemoResponse:
