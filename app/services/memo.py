@@ -4,6 +4,7 @@ from app.crud.memo import (
     read_memo_by_id,
     read_memos_by_date,
     read_memos_by_period,
+    read_memos_by_period_and_category_id,
     update_memo,
     delete_memo,
 )
@@ -33,9 +34,11 @@ async def select_month_memos_service(
 async def select_month_memos_by_category_id_service(
     db: AsyncSession, user_id: UUID, category_id: UUID, year: int, month: int
 ) -> List[MemoResponse]:
-    db_memos = await select_month_memos_service(db, user_id, year, month)
-
-    return [memo for memo in db_memos if memo.category_id == category_id]
+    start_date = datetime(year, month, 1)
+    end_date = datetime(year, month + 1, 1) - timedelta(days=1)
+    return await read_memos_by_period_and_category_id(
+        db, user_id, category_id, start_date, end_date
+    )
 
 
 async def add_memo_service(
