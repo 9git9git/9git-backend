@@ -4,8 +4,6 @@ from datetime import datetime
 
 
 class MemoCreate(BaseModel):
-    userId: UUID
-    categoryId: UUID
     title: str
     content: str
     startDate: datetime
