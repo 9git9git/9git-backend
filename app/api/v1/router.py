@@ -21,4 +21,8 @@ router.include_router(
     prefix="/users/{user_id}/comprehensive_evaluations",
     tags=["comprehensive_evaluations"],
 )
-router.include_router(memo.router, prefix="/memos", tags=["memos"])
+router.include_router(
+    memo.router,
+    prefix="/users/{user_id}/categories/{category_id}/memos",
+    tags=["memos"],
+)
