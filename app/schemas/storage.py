@@ -3,7 +3,6 @@ from uuid import UUID
 
 
 class StorageCreate(BaseModel):
-    id: UUID
     title: str
 
 
