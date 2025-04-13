@@ -102,13 +102,8 @@ async def update_memo(
         snake_key = camel_to_snake(key)
         setattr(db_memo, snake_key, value)
 
-    try:
-        db.add(db_memo)
-        await db.commit()
-        await db.refresh(db_memo)
-    except Exception as e:
-        await db.rollback()
-        raise e
+    await db.commit()
+    await db.refresh(db_memo)
     return db_memo
 
 
