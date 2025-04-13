@@ -8,7 +8,7 @@ from app.crud.category import (
 )
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from typing import List
 from uuid import UUID
 
@@ -18,7 +18,10 @@ async def add_category(
 ) -> CategoryResponse:
     existing = await read_category_by_name(db, category_data.category_name)
     if existing:
-        raise HTTPException(status_code=400, detail="이미 존재하는 카테고리입니다.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="이미 존재하는 카테고리입니다.",
+        )
 
     category = await create_category(db, category_data)
     return category
@@ -33,7 +36,9 @@ async def select_category_by_name(
 ) -> CategoryResponse:
     category = await read_category_by_name(db, category_name)
     if not category:
-        raise HTTPException(status_code=404, detail="카테고리를 찾을 수 없습니다.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="카테고리를 찾을 수 없습니다."
+        )
     return category
 
 
@@ -42,7 +47,9 @@ async def select_category_by_id(
 ) -> CategoryResponse:
     category = await read_category_by_id(db, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="카테고리를 찾을 수 없습니다.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="카테고리를 찾을 수 없습니다."
+        )
     return category
 
 
@@ -51,7 +58,9 @@ async def update_category_by_id(
 ) -> CategoryResponse:
     category = await read_category_by_id(db, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="카테고리를 찾을 수 없습니다.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="카테고리를 찾을 수 없습니다."
+        )
 
     updated_category = await update_category(db, category_id, category_data)
     return updated_category
@@ -60,6 +69,8 @@ async def update_category_by_id(
 async def delete_category_by_id(db: AsyncSession, category_id: UUID) -> bool:
     category = await read_category_by_id(db, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="카테고리를 찾을 수 없습니다.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="카테고리를 찾을 수 없습니다."
+        )
 
     return await delete_category(db, category_id)
