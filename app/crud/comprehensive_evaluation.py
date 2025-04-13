@@ -53,9 +53,7 @@ async def read_comprehensive_evaluation(
         )
     )
 
-    result = comprehensive_evaluation.scalars().first()
-
-    return result
+    return comprehensive_evaluation.scalars().first()
 
 
 async def update_comprehensive_evaluation(
