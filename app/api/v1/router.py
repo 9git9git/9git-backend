@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     character,
     user_character,
     comprehensive_evaluation,
+    memo,
 )
 
 router = APIRouter()
@@ -20,3 +21,4 @@ router.include_router(
     prefix="/users/{user_id}/comprehensive_evaluations",
     tags=["comprehensive_evaluations"],
 )
+router.include_router(memo.router, prefix="/memos", tags=["memos"])
