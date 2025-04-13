@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # 동기 데이터베이스 연결 문자열 (Alembic 에서 사용)
     SYNC_DATABASE_URL: str
 
-    model_config = ConfigDict(env_file=".env", extra="allow")
+    model_config = ConfigDict(env_file=".env", env_file_encoding='utf-8', extra="allow")
 
 
 settings = Settings()
