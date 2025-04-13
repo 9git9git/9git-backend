@@ -47,10 +47,17 @@ async def update_storage_service(
 async def delete_storage_service(
     db: AsyncSession, user_id: UUID, category_id: UUID, storage_id: UUID
 ) -> bool:
-    db_storage = await read_storage_by_id(db, user_id, category_id, storage_id)
-    if not db_storage:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="존재하지 않는 보관함입니다."
-        )
+    try:
+        db_storage = await read_storage_by_id(db, user_id, category_id, storage_id)
+        if not db_storage:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="존재하지 않는 보관함입니다.",
+            )
 
-    return await delete_storage(db, user_id, category_id, storage_id)
+        return await delete_storage(db, user_id, category_id, storage_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="보관함 삭제 중 오류가 발생했습니다.",
+        ) from e

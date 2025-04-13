@@ -70,7 +70,12 @@ async def delete_storage(
         Storage.id == storage_id,
     )
 
-    await db.execute(delete_statement)
-    await db.commit()
+    try:
+        await db.execute(delete_statement)
+        await db.commit()
+
+    except Exception as e:
+        await db.rollback()
+        raise e
 
     return True
