@@ -51,7 +51,7 @@ async def read_memos_by_date(
     return db_memo.scalars().all()
 
 
-async def read_memos_by_month(
+async def read_memos_by_period(
     db: AsyncSession, user_id: UUID, start_date: datetime, end_date: datetime
 ) -> List[MemoResponse]:
     db_memo = await db.execute(

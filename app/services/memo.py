@@ -3,7 +3,7 @@ from app.crud.memo import (
     create_memo,
     read_memo_by_id,
     read_memos_by_date,
-    read_memos_by_month,
+    read_memos_by_period,
     update_memo,
     delete_memo,
 )
@@ -27,7 +27,7 @@ async def select_month_memos_service(
 
     start_date = datetime(year, month, 1)
     end_date = datetime(year, month + 1, 1) - timedelta(days=1)
-    return await read_memos_by_month(db, user_id, start_date, end_date)
+    return await read_memos_by_period(db, user_id, start_date, end_date)
 
 
 async def select_month_memos_by_category_id_service(
