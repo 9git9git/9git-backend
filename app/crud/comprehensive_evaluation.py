@@ -68,17 +68,11 @@ async def update_comprehensive_evaluation(
 
     update_data = comprehensive_evaluation.model_dump(exclude_unset=True)
 
-    converted_data = {}
-
-    # 모든 키를 카멜케이스에서 스네이크케이스로 변환
+    # 변환된 키-값 쌍으로 ORM 객체 업데이트
     for key, value in update_data.items():
         snake_key = camel_to_snake(key)
-        converted_data[snake_key] = value
 
-    # 변환된 키-값 쌍으로 ORM 객체 업데이트
-    for key, value in converted_data.items():
-
-        setattr(db_comprehensive_evaluation, key, value)
+        setattr(db_comprehensive_evaluation, snake_key, value)
 
     await db.commit()
     await db.refresh(db_comprehensive_evaluation)
