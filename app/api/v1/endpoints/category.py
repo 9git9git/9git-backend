@@ -64,15 +64,13 @@ async def get_category_by_id(
         )
 
 
-@router.get("/name/{category_name}", response_model=ResponseBase[CategoryResponse])
+@router.get("/names/{category_name}", response_model=ResponseBase[CategoryResponse])
 async def get_category_by_name(
     category_name: str,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[CategoryResponse]:
     try:
         category = await select_category_by_name(db, category_name)
-        if not category:
-            raise HTTPException(status_code=404, detail="카테고리를 찾을 수 없습니다.")
         return ResponseBase(status_code=status.HTTP_200_OK, data=category)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
