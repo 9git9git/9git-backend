@@ -7,9 +7,11 @@ from sqlalchemy import select, delete
 
 
 async def create_storage(
-    db: AsyncSession, storage_data: StorageCreate
+    db: AsyncSession, user_id: UUID, category_id: UUID, storage_data: StorageCreate
 ) -> StorageResponse:
     db_storage = Storage(
+        user_id=user_id,
+        category_id=category_id,
         title=storage_data.title,
     )
 

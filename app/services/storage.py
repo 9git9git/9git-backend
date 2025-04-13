@@ -24,8 +24,10 @@ async def select_storage_by_id(
     return await read_storage_by_id(db, user_id, category_id, storage_id)
 
 
-async def add_storage(db: AsyncSession, storage_data: StorageCreate) -> StorageResponse:
-    return await create_storage(db, storage_data)
+async def add_storage(
+    db: AsyncSession, user_id: UUID, category_id: UUID, storage_data: StorageCreate
+) -> StorageResponse:
+    return await create_storage(db, user_id, category_id, storage_data)
 
 
 async def update_storage_service(
