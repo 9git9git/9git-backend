@@ -65,16 +65,15 @@ async def read_recommended_challenge(
 async def update_recommended_challenge(
     db: AsyncSession,
     user_id: UUID,
-    challenge_id: UUID,
+    category_id: UUID,
     challenge_data: RecommendedChallengeUpdate,
 ) -> RecommendedChallengeResponse:
-    db_challenge = await read_recommended_challenge(db, user_id, challenge_id)
+    db_challenge = await read_recommended_challenge(db, user_id, category_id)
 
     update_data = challenge_data.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
         snake_key = camel_to_snake(key)
-
         setattr(db_challenge, snake_key, value)
 
     await db.commit()
@@ -84,18 +83,18 @@ async def update_recommended_challenge(
 
 # 삭제
 async def delete_recommended_challenge(
-    db: AsyncSession, user_id: UUID, challenge_id: UUID
+    db: AsyncSession,
+    user_id: UUID,
+    category_id: UUID,
 ) -> bool:
-    result = await db.execute(
-        select(RecommendedChallenge).where(
-            RecommendedChallenge.id == challenge_id,
-            RecommendedChallenge.user_id == user_id,
-        )
+    delete_statement = delete(RecommendedChallenge).where(
+        RecommendedChallenge.user_id == user_id,
+        RecommendedChallenge.category_id == category_id,
     )
-    db_challenge = result.scalars().first()
-    if not db_challenge:
-        return False
-
-    await db.delete(db_challenge)
-    await db.commit()
+    try:
+        await db.execute(delete_statement)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e
     return True

@@ -1,7 +1,6 @@
 from uuid import UUID
 from typing import Optional
 from app.schemas.base import BaseModel
-from app.enum.category import CategoryNameEnum
 
 
 # 생성

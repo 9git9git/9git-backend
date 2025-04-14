@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from decimal import Decimal
 from typing import List, Optional
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 
 from app.schemas.recommended_challenge import (
@@ -18,7 +18,6 @@ from app.crud.recommended_challenge import (
     update_recommended_challenge,
     delete_recommended_challenge,
 )
-from app.models.evaluation import RecommendedChallenge
 
 
 # ID 기준 단일 조회
@@ -30,7 +29,8 @@ async def select_recommended_challenge(
     challenge = await read_recommended_challenge(db, user_id, recommended_challenge_id)
     if not challenge:
         raise HTTPException(
-            status_code=404, detail="추천 도전 과제를 찾을 수 없습니다."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="추천 도전 과제를 찾을 수 없습니다.",
         )
     return challenge
 
@@ -43,7 +43,7 @@ async def select_recommended_challenges(
     return await read_recommended_challenges(db, user_id)
 
 
-# 추천 도전 과제 생성
+# 생성
 async def add_recommended_challenge(
     db: AsyncSession,
     user_id: UUID,
@@ -56,7 +56,7 @@ async def add_recommended_challenge(
     )
 
 
-# 추천 도전 과제 수정
+# 수정
 async def update_recommended_challenge_service(
     db: AsyncSession,
     user_id: UUID,
@@ -68,7 +68,8 @@ async def update_recommended_challenge_service(
     )
     if not db_challenge:
         raise HTTPException(
-            status_code=404, detail="추천 도전 과제를 찾을 수 없습니다."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="추천 도전 과제를 찾을 수 없습니다.",
         )
 
     return await update_recommended_challenge(
@@ -76,18 +77,24 @@ async def update_recommended_challenge_service(
     )
 
 
-# 추천 도전 과제 삭제
+# 삭제
 async def delete_recommended_challenge_service(
     db: AsyncSession,
     user_id: UUID,
-    recommended_challenge_id: UUID,
+    category_id: UUID,
 ) -> bool:
-    db_challenge = await read_recommended_challenge(
-        db, user_id, recommended_challenge_id
-    )
-    if not db_challenge:
+    try:
+        challenge = await read_recommended_challenge(db, user_id, category_id)
+        if not challenge:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="추천 도전 과제를 찾을 수 없습니다.",
+            )
+        return await delete_recommended_challenge(db, user_id, category_id)
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(
-            status_code=404, detail="추천 도전 과제를 찾을 수 없습니다."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="데이터베이스 오류가 발생했습니다.",
         )
-
-    return await delete_recommended_challenge(db, user_id, recommended_challenge_id)
