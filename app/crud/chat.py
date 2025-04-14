@@ -103,11 +103,14 @@ async def delete_chat(
     user_id: UUID,
     chat_id: UUID,
 ) -> bool:
-
     delete_statement = delete(Chat).where(
         Chat.id == chat_id,
         Chat.user_id == user_id,
     )
-    await db.execute(delete_statement)
-    await db.commit()
+    try:
+        await db.execute(delete_statement)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise e
     return True

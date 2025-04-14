@@ -76,7 +76,7 @@ async def update_chat_service(
     if not db_chat:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="채팅 정보를 찾을 수 없습니다.",
+            detail="채팅을 찾을 수 없습니다.",
         )
     return await update_chat(db, user_id, chat_id, chat_data)
 
@@ -87,10 +87,20 @@ async def delete_chat_service(
     user_id: UUID,
     chat_id: UUID,
 ) -> bool:
-    db_chat = await read_chat(db, user_id, chat_id)
-    if not db_chat:
+    try:
+        db_chat = await read_chat(db, user_id, chat_id)
+        if not db_chat:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="채팅을 찾을 수 없습니다.",
+            )
+
+        return await delete_chat(db, user_id, chat_id)
+
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="채팅 정보를 찾을 수 없습니다.",
-        )
-    return await delete_chat(db, user_id, chat_id)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="데이터베이스 오류가 발생했습니다.",
+        ) from e
