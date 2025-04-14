@@ -4,11 +4,14 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.category import Category
-from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.utils.to_snake_case import camel_to_snake
 
 
-async def create_category(db: AsyncSession, category_data: CategoryCreate) -> Category:
+# ✅ 카테고리 생성
+async def create_category(
+    db: AsyncSession, category_data: CategoryCreate
+) -> CategoryResponse:
     db_category = Category(
         category_name=category_data.categoryName,
         category_color=category_data.categoryColor,
@@ -19,18 +22,23 @@ async def create_category(db: AsyncSession, category_data: CategoryCreate) -> Ca
     return db_category
 
 
-async def read_categories(db: AsyncSession) -> List[Category]:
+# ✅ 전체 카테고리 조회
+async def read_categories(db: AsyncSession) -> List[CategoryResponse]:
     result = await db.execute(select(Category))
-    return result.scalars().all()
+    categories = result.scalars().all()
+    return categories
 
 
+# ✅ ID로 카테고리 조회
 async def read_category_by_id(
     db: AsyncSession, category_id: UUID
-) -> Optional[Category]:
+) -> Optional[CategoryResponse]:
     result = await db.execute(select(Category).where(Category.id == category_id))
-    return result.scalars().first()
+    category = result.scalars().first()
+    return category
 
 
+# ✅ 이름으로 카테고리 조회 (ORM 객체 그대로 반환)
 async def read_category_by_name(
     db: AsyncSession, category_name: str
 ) -> Optional[Category]:
@@ -40,9 +48,10 @@ async def read_category_by_name(
     return result.scalars().first()
 
 
+# ✅ 카테고리 수정
 async def update_category(
     db: AsyncSession, db_category: Category, category_data: CategoryUpdate
-) -> Category:
+) -> CategoryResponse:
     update_data = category_data.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
@@ -54,6 +63,7 @@ async def update_category(
     return db_category
 
 
+# ✅ 카테고리 삭제
 async def delete_category(db: AsyncSession, db_category: Category) -> bool:
     delete_stmt = delete(Category).where(Category.id == db_category.id)
     try:
