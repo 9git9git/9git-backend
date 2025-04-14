@@ -13,16 +13,19 @@ from app.services.todo import (
 )
 from app.db.session import get_db
 
-router = APIRouter(prefix="/todos", tags=["Todo"])
+router = APIRouter()
 
 
+# 할 일 생성
 @router.post("/", response_model=ResponseBase[TodoResponse])
 async def create_todo(
+    user_id: UUID,
+    category_id: UUID,
     todo_data: TodoCreate,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[TodoResponse]:
     try:
-        todo = await add_todo(db, todo_data)
+        todo = await add_todo(db, user_id, category_id, todo_data)
         return ResponseBase(status_code=status.HTTP_201_CREATED, data=todo)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
@@ -33,12 +36,14 @@ async def create_todo(
         )
 
 
+# 전체 할 일 조회 (유저 기준)
 @router.get("/", response_model=ResponseBase[List[TodoResponse]])
 async def get_all_todos(
+    user_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[List[TodoResponse]]:
     try:
-        todos = await select_all_todos(db)
+        todos = await select_all_todos(db, user_id)
         return ResponseBase(status_code=status.HTTP_200_OK, data=todos)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
@@ -49,13 +54,15 @@ async def get_all_todos(
         )
 
 
+# 특정 할 일 조회
 @router.get("/{todo_id}", response_model=ResponseBase[TodoResponse])
 async def get_todo_by_id(
+    user_id: UUID,
     todo_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[TodoResponse]:
     try:
-        todo = await select_todo_by_id(db, todo_id)
+        todo = await select_todo_by_id(db, user_id, todo_id)
         return ResponseBase(status_code=status.HTTP_200_OK, data=todo)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
@@ -66,14 +73,16 @@ async def get_todo_by_id(
         )
 
 
-@router.patch("/{todo_id}", response_model=ResponseBase[TodoResponse])
+# 할 일 수정
+@router.put("/{todo_id}", response_model=ResponseBase[TodoResponse])
 async def update_todo(
+    user_id: UUID,
     todo_id: UUID,
     todo_data: TodoUpdate,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[TodoResponse]:
     try:
-        todo = await update_todo_by_id(db, todo_id, todo_data)
+        todo = await update_todo_by_id(db, user_id, todo_id, todo_data)
         return ResponseBase(status_code=status.HTTP_200_OK, data=todo)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
@@ -84,13 +93,15 @@ async def update_todo(
         )
 
 
+# 할 일 삭제
 @router.delete("/{todo_id}", response_model=ResponseBase[bool])
 async def delete_todo(
+    user_id: UUID,
     todo_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[bool]:
     try:
-        result = await delete_todo_service(db, todo_id)
+        result = await delete_todo_service(db, user_id, todo_id)
         return ResponseBase(status_code=status.HTTP_200_OK, data=result)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)

@@ -60,3 +60,8 @@ router.include_router(
     progress.router, prefix="/ users/{user_id}/progresses", tags=["Progress"]
 )
 router.include_router(todo.router, prefix="/todos", tags=["todos"])
+router.include_router(
+    todo.router,
+    prefix="/users/{user_id}/categories/{category_id}/todos",
+    tags=["todos"],
+)
