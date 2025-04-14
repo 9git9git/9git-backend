@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     storage,
     recommended_challenge,
     week,
+    chat,
 )
 
 router = APIRouter()
@@ -47,4 +48,9 @@ router.include_router(
     week.router,
     prefix="/users/{user_id}/categories/{category_id}/todos/{todo_id}/weeks",
     tags=["weeks"],
+)
+router.include_router(
+    chat.router,
+    prefix="/users/{user_id}",
+    tags=["chats"],
 )
