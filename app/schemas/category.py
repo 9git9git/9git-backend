@@ -15,8 +15,6 @@ class CategoryResponse(BaseModel):
     category_name: CategoryNameEnum
     category_color: CategoryColorEnum
 
-    model_config = ConfigDict(from_attributes=True)
-
 
 # 수정용
 class CategoryUpdate(BaseModel):
