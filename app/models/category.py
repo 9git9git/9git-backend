@@ -73,7 +73,9 @@ class Todo(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-    week_id: Mapped[int] = mapped_column(ForeignKey("weeks.id"), nullable=False)
+    week_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("weeks.id"), nullable=True
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
