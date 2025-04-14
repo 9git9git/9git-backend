@@ -9,6 +9,7 @@ from app.api.v1.endpoints import (
     category,
     storage,
     recommended_challenge,
+    week,
 )
 
 router = APIRouter()
@@ -35,8 +36,15 @@ router.include_router(
     prefix="/users/{user_id}/categories/{category_id}/storages",
     tags=["storages"],
 )
+
 router.include_router(
     recommended_challenge.router,
     prefix="/users/{user_id}/categories/{category_id}/recommend-challenges",
     tags=["RecommendedChallenges"],
+)
+
+router.include_router(
+    week.router,
+    prefix="/users/{user_id}/categories/{category_id}/todos/{todo_id}/weeks",
+    tags=["weeks"],
 )
