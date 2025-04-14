@@ -1,12 +1,12 @@
-from pydantic import BaseModel, ConfigDict
+from app.schemas.base import BaseModel
 from uuid import UUID
 from app.enum.category import CategoryNameEnum, CategoryColorEnum
 from typing import Optional
 
 
 class CategoryCreate(BaseModel):
-    categoryName: CategoryNameEnum
-    categoryColor: CategoryColorEnum
+    category_name: CategoryNameEnum
+    category_color: CategoryColorEnum
 
 
 # 응답용
