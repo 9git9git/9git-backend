@@ -2,50 +2,58 @@ from typing import List, Optional
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+
 from app.models.category import Progress
 from app.schemas.progress import ProgressCreate, ProgressUpdate, ProgressResponse
 
 
+# 진행 생성
 async def create_progress(
     db: AsyncSession, progress_data: ProgressCreate
 ) -> ProgressResponse:
     progress = Progress(
-        user_id=progress_data.user_id,
-        category_id=progress_data.category_id,
-        start_date=progress_data.start_date,
-        end_date=progress_data.end_date,
+        user_id=progress_data.userId,
+        category_id=progress_data.categoryId,
+        start_date=progress_data.startDate,
+        end_date=progress_data.endDate,
     )
     db.add(progress)
     await db.commit()
     await db.refresh(progress)
-    return ProgressResponse.model_validate(progress)
+    return progress
 
 
-async def read_all_progresses(db: AsyncSession) -> List[ProgressResponse]:
-    result = await db.execute(select(Progress))
-    progresses = result.scalars().all()
-    return [ProgressResponse.model_validate(p) for p in progresses]
+# 전체 진행 조회
+async def read_all_progresses(
+    db: AsyncSession, user_id: UUID
+) -> List[ProgressResponse]:
+    result = await db.execute(select(Progress).where(Progress.user_id == user_id))
+    return result.scalars().all()
 
 
+# ID로 진행 조회
 async def read_progress_by_id(
     db: AsyncSession, progress_id: UUID
 ) -> Optional[ProgressResponse]:
     result = await db.execute(select(Progress).where(Progress.id == progress_id))
-    progress = result.scalars().first()
-    return ProgressResponse.model_validate(progress) if progress else None
+    return result.scalars().first()
 
 
+# 진행 수정
 async def update_progress(
     db: AsyncSession, progress: Progress, progress_data: ProgressUpdate
 ) -> ProgressResponse:
     update_data = progress_data.model_dump(exclude_unset=True)
+
     for key, value in update_data.items():
         setattr(progress, key, value)
+
     await db.commit()
     await db.refresh(progress)
-    return ProgressResponse.model_validate(progress)
+    return progress
 
 
+# 진행 삭제
 async def delete_progress(db: AsyncSession, progress: Progress) -> bool:
     delete_statement = delete(Progress).where(Progress.id == progress.id)
 
