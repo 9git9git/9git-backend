@@ -20,5 +20,5 @@ class CategoryResponse(BaseModel):
 
 # 수정용
 class CategoryUpdate(BaseModel):
-    category_name: Optional[CategoryNameEnum] = None
-    category_color: Optional[CategoryColorEnum] = None
+    categoryName: Optional[CategoryNameEnum] = None
+    categoryColor: Optional[CategoryColorEnum] = None
