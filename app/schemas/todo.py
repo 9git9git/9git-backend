@@ -17,14 +17,14 @@ class TodoCreate(BaseModel):
 # 응답: 할 일 조회용
 class TodoResponse(BaseModel):
     id: UUID
-    userId: UUID
-    categoryId: UUID
-    weekId: UUID
+    user_id: UUID
+    category_id: UUID
+    week_id: UUID
     content: str
-    startDate: date
-    endDate: date
-    isCompleted: bool
-    isRepeat: bool
+    start_date: date
+    end_date: date
+    is_completed: bool
+    is_repeat: bool
 
 
 # 요청: 할 일 수정용 (전부 Optional)
