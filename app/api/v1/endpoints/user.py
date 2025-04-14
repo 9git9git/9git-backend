@@ -40,11 +40,6 @@ async def get_user_by_id(
 ) -> ResponseBase[UserResponse]:
     try:
         user = await select_user_by_id(db, user_id)
-        if not user:
-            return ResponseBase(
-                status_code=status.HTTP_404_NOT_FOUND,
-                error="사용자를 찾을 수 없습니다.",
-            )
         return ResponseBase(status_code=status.HTTP_200_OK, data=user)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
@@ -61,11 +56,6 @@ async def get_user_by_email(
 ) -> ResponseBase[UserResponse]:
     try:
         user = await select_user_by_email(db, email)
-        if not user:
-            return ResponseBase(
-                status_code=status.HTTP_404_NOT_FOUND,
-                error="사용자를 찾을 수 없습니다.",
-            )
         return ResponseBase(status_code=status.HTTP_200_OK, data=user)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
