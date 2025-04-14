@@ -16,7 +16,7 @@ from uuid import UUID
 async def add_category(
     db: AsyncSession, category_data: CategoryCreate
 ) -> CategoryResponse:
-    existing = await read_category_by_name(db, category_data.category_name)
+    existing = await read_category_by_name(db, category_data.categoryName)
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

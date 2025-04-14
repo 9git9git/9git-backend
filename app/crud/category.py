@@ -2,13 +2,12 @@ from typing import List, Optional
 from uuid import UUID
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.utils.to_snake_case import camel_to_snake
 
 
-# ✅ 카테고리 생성
+# 카테고리 생성
 async def create_category(
     db: AsyncSession, category_data: CategoryCreate
 ) -> CategoryResponse:
@@ -22,14 +21,14 @@ async def create_category(
     return db_category
 
 
-# ✅ 전체 카테고리 조회
+# 전체 카테고리 조회
 async def read_categories(db: AsyncSession) -> List[CategoryResponse]:
     result = await db.execute(select(Category))
     categories = result.scalars().all()
     return categories
 
 
-# ✅ ID로 카테고리 조회
+# ID로 카테고리 조회
 async def read_category_by_id(
     db: AsyncSession, category_id: UUID
 ) -> Optional[CategoryResponse]:
@@ -38,7 +37,7 @@ async def read_category_by_id(
     return category
 
 
-# ✅ 이름으로 카테고리 조회 (ORM 객체 그대로 반환)
+# 이름으로 카테고리 조회 (ORM 객체 그대로 반환)
 async def read_category_by_name(
     db: AsyncSession, category_name: str
 ) -> Optional[Category]:
@@ -48,7 +47,7 @@ async def read_category_by_name(
     return result.scalars().first()
 
 
-# ✅ 카테고리 수정
+# 카테고리 수정
 async def update_category(
     db: AsyncSession, db_category: Category, category_data: CategoryUpdate
 ) -> CategoryResponse:
@@ -63,7 +62,7 @@ async def update_category(
     return db_category
 
 
-# ✅ 카테고리 삭제
+# 카테고리 삭제
 async def delete_category(db: AsyncSession, db_category: Category) -> bool:
     delete_stmt = delete(Category).where(Category.id == db_category.id)
     try:
