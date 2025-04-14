@@ -5,16 +5,10 @@ from decimal import Decimal
 
 
 class ProgressCreate(BaseModel):
-    user_id: UUID
-    category_id: UUID
-    start_date: date
-    end_date: date
-
-
-class ProgressUpdate(BaseModel):
-    progress_rate: Decimal | None = None
-    start_date: date | None = None
-    end_date: date | None = None
+    userId: UUID
+    categoryId: UUID
+    startDate: date
+    endDate: date
 
 
 class ProgressResponse(BaseModel):
@@ -25,5 +19,8 @@ class ProgressResponse(BaseModel):
     start_date: date
     end_date: date
 
-    class Config:
-        orm_mode = True
+
+class ProgressUpdate(BaseModel):
+    progressRate: Decimal | None = None
+    startDate: date | None = None
+    endDate: date | None = None
