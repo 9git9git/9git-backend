@@ -67,10 +67,16 @@ async def update_category_by_id(
 
 
 async def delete_category_by_id(db: AsyncSession, category_id: UUID) -> bool:
-    category = await read_category_by_id(db, category_id)
-    if not category:
+    try:
+        category = await read_category_by_id(db, category_id)
+        if not category:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="카테고리를 찾을 수 없습니다.",
+            )
+        return await delete_category(db, category_id)
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="카테고리를 찾을 수 없습니다."
-        )
-
-    return await delete_category(db, category_id)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="데이터베이스 오류가 발생했습니다.",
+        ) from e
