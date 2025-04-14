@@ -9,10 +9,10 @@ from app.schemas.progress import ProgressCreate, ProgressUpdate, ProgressRespons
 
 # 진행 생성
 async def create_progress(
-    db: AsyncSession, progress_data: ProgressCreate
+    db: AsyncSession, user_id: UUID, progress_data: ProgressCreate
 ) -> ProgressResponse:
     progress = Progress(
-        user_id=progress_data.userId,
+        user_id=user_id,
         category_id=progress_data.categoryId,
         start_date=progress_data.startDate,
         end_date=progress_data.endDate,

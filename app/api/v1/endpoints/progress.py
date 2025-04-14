@@ -19,11 +19,12 @@ router = APIRouter()
 
 @router.post("/", response_model=ResponseBase[ProgressResponse])
 async def post_progress(
+    user_id: UUID,
     progress_data: ProgressCreate,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[ProgressResponse]:
     try:
-        progress = await add_progress(db, progress_data)
+        progress = await add_progress(db, user_id, progress_data)
         return ResponseBase(status_code=status.HTTP_201_CREATED, data=progress)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
