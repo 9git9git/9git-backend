@@ -1,11 +1,10 @@
-from pydantic import BaseModel
 from uuid import UUID
 from datetime import date
 from decimal import Decimal
+from app.schemas.base import BaseModel
 
 
 class ProgressCreate(BaseModel):
-    userId: UUID
     categoryId: UUID
     startDate: date
     endDate: date

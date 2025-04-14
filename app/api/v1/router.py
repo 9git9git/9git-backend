@@ -55,4 +55,6 @@ router.include_router(
     prefix="/users/{user_id}",
     tags=["chats"],
 )
-router.include_router(progress.router, prefix="/progresses", tags=["Progress"])
+router.include_router(
+    progress.router, prefix="/ users/{user_id}/progresses", tags=["Progress"]
+)
