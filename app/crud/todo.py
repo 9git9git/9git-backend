@@ -13,16 +13,13 @@ async def create_todo(
     todo = Todo(
         user_id=user_id,
         category_id=category_id,
+        week_id=todo_data.weekId,
         content=todo_data.content,
         start_date=todo_data.startDate,
         end_date=todo_data.endDate,
         is_completed=todo_data.isCompleted,
         is_repeat=todo_data.isRepeat,
     )
-
-    # ✅ Optional 필드 따로 주입
-    if todo_data.weekId is not None:
-        todo.week_id = todo_data.weekId
 
     db.add(todo)
     await db.commit()
