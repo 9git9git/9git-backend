@@ -6,7 +6,7 @@ from app.schemas.base import BaseModel
 
 # 요청: 할 일 생성용
 class TodoCreate(BaseModel):
-    weekId: int
+    weekId: Optional[UUID] = None
     content: str
     startDate: date
     endDate: date
@@ -19,7 +19,7 @@ class TodoResponse(BaseModel):
     id: UUID
     userId: UUID
     categoryId: UUID
-    weekId: int
+    weekId: UUID
     content: str
     startDate: date
     endDate: date
@@ -35,4 +35,4 @@ class TodoUpdate(BaseModel):
     isCompleted: Optional[bool] = None
     isRepeat: Optional[bool] = None
     categoryId: Optional[UUID] = None
-    weekId: Optional[int] = None
+    weekId: Optional[UUID] = None
