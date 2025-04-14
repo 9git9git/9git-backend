@@ -6,6 +6,7 @@ from app.api.v1.endpoints import (
     user_character,
     comprehensive_evaluation,
     memo,
+    category,
 )
 
 router = APIRouter()
@@ -26,3 +27,4 @@ router.include_router(
     prefix="/users/{user_id}/categories/{category_id}/memos",
     tags=["memos"],
 )
+router.include_router(category.router, prefix="/categories", tags=["Category"])
