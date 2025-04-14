@@ -1,0 +1,61 @@
+name: Build and Push Backend Image to ACR
+
+# 워크플로우 트리거 설정
+on:
+  push:
+    branches: [ dev, main ] # dev와 main 브랜치에 push될 때 실행
+  workflow_dispatch: {} # GitHub Actions 탭에서 수동으로 실행 가능
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest # 실행 환경 지정
+    steps:
+      # 1. 소스 코드 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Azure 로그인 (Service Principal 사용)
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 3. ACR 로그인 (Azure 자격 증명 사용)
+      - name: Log in to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # 4. Docker 이미지 메타데이터 추출 (태그 생성 등)
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta # 이 step의 출력을 참조하기 위한 ID
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/${{ github.ref == 'refs/heads/dev' && secrets.ACR_REPOSITORY_NAME_TEST || secrets.ACR_REPOSITORY_NAME }}
+          # 예시 태그: main 브랜치면 latest, 그 외에는 브랜치명, 그리고 항상 Git SHA 태그 추가
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # 5. Docker 이미지 빌드 및 ACR에 푸시
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # Dockerfile이 있는 경로
+          file: ./Dockerfile # Dockerfile 경로 명시 (기본값)
+          push: true # 빌드 후 푸시 실행
+          tags: ${{ steps.meta.outputs.tags }} # 위 metadata step에서 생성된 태그 사용
+          labels: ${{ steps.meta.outputs.labels }} # 위 metadata step에서 생성된 라벨 사용
+
+      # 6. ACR에 푸시된 이미지 확인
+      - name: Verify pushed image
+        run: |
+          echo "Pushed image tags:"
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "Checking image in ACR..."
+          echo "Basic tag information:"
+          az acr repository show-tags --name ${{ secrets.ACR_LOGIN_SERVER }} --repository ${{ github.ref == 'refs/heads/dev' && secrets.ACR_REPOSITORY_NAME_TEST || secrets.ACR_REPOSITORY_NAME }} --output table
