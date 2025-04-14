@@ -5,8 +5,8 @@ from typing import Optional
 
 
 class CategoryCreate(BaseModel):
-    category_name: CategoryNameEnum
-    category_color: CategoryColorEnum
+    categoryName: CategoryNameEnum
+    categoryColor: CategoryColorEnum
 
 
 # 응답용
