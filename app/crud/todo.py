@@ -1,5 +1,5 @@
 from app.models.week import Week
-from sqlalchemy import select, delete, and_, or_
+from sqlalchemy import select, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from typing import List, Optional
@@ -7,8 +7,7 @@ from app.models.category import Todo
 from app.schemas.todo import TodoCreate, TodoUpdate, TodoResponse
 from sqlalchemy.orm import selectinload
 from app.utils.to_snake_case import camel_to_snake
-from datetime import date, timedelta
-from app.enum.week import WeekdayEnum
+from datetime import date
 
 
 # 할 일 생성
@@ -89,6 +88,29 @@ async def read_raw_todo_by_id(
     return result.scalars().first()
 
 
+# 날짜 범위로 할 일 조회 (기본)
+async def read_todos_by_period(
+    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
+) -> List[Todo]:
+
+    # 해당 기간과 겹치는 모든 Todo 가져오기 (간소화된 조건)
+    query = (
+        select(Todo)
+        .options(selectinload(Todo.weeks), selectinload(Todo.category))
+        .where(
+            Todo.user_id == user_id,
+            # 모든 겹침 케이스를 처리하는 단일 조건
+            Todo.start_date <= end_date,
+            Todo.end_date >= start_date,
+        )
+    )
+
+    result = await db.execute(query)
+
+    # unique -> 조인 쿼리 시 중복 데이터 제거
+    return result.unique().scalars().all()
+
+
 # 특정 유저의 특정 카테고리에 속한 할 일 목록 조회
 async def read_todos_by_user_and_category(
     db: AsyncSession, user_id: UUID, category_id: UUID
@@ -151,76 +173,3 @@ async def delete_todo(db: AsyncSession, todo: Todo) -> bool:
         await db.rollback()
         raise e
     return True
-
-
-# 날짜 범위로 할 일 조회 (반복 요일 고려)
-async def read_todos_by_date_range(
-    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
-) -> List[TodoResponse]:
-    """
-    주어진 날짜 범위 내에 있는 Todo를 조회합니다.
-
-    1. 일반 Todo: 날짜 범위와 겹치는 모든 Todo를 반환
-    2. 반복 Todo: 날짜 범위 내에서 지정된 요일에 반복되는 Todo를 반환
-    """
-    # 기본 쿼리: 해당 기간과 겹치는 모든 Todo 가져오기
-    query = (
-        select(Todo)
-        .options(
-            selectinload(Todo.weeks),
-            selectinload(Todo.category),
-        )
-        .where(
-            and_(
-                Todo.user_id == user_id,
-                or_(
-                    # Case 1: Todo 시작일이 검색 기간 내에 있음
-                    and_(Todo.start_date >= start_date, Todo.start_date <= end_date),
-                    # Case 2: Todo 종료일이 검색 기간 내에 있음
-                    and_(Todo.end_date >= start_date, Todo.end_date <= end_date),
-                    # Case 3: Todo 기간이 검색 기간을 포함
-                    and_(Todo.start_date <= start_date, Todo.end_date >= end_date),
-                ),
-            )
-        )
-    )
-
-    result = await db.execute(query)
-    todos = list(result.scalars().all())
-    todo_responses = []
-
-    # 각 Todo에 대해 처리
-    for todo in todos:
-        if not todo.is_repeat or not todo.weeks:
-            # 반복이 아닌 Todo는 그대로 추가
-            todo_responses.append(todo)
-        else:
-            # 반복 Todo의 경우 해당 날짜 범위의 각 날짜를 확인
-            # 각 요일별로 해당 Todo를 반환
-            # Todo 객체의 내용을 복사하되, 시작/종료 날짜를 해당 날짜로 설정
-            weekday_map = {
-                WeekdayEnum.MONDAY: 0,
-                WeekdayEnum.TUESDAY: 1,
-                WeekdayEnum.WEDNESDAY: 2,
-                WeekdayEnum.THURSDAY: 3,
-                WeekdayEnum.FRIDAY: 4,
-                WeekdayEnum.SATURDAY: 5,
-                WeekdayEnum.SUNDAY: 6,
-            }
-
-            # Todo에 설정된 반복 요일들
-            todo_weekdays = {weekday_map[week.week_name] for week in todo.weeks}
-
-            # 해당 기간의 모든 날짜를 순회
-            current_date = max(start_date, todo.start_date)
-            end = min(end_date, todo.end_date)
-
-            while current_date <= end:
-                # 해당 날짜의 요일이 Todo의 반복 요일에 포함되는지 확인
-                if current_date.weekday() in todo_weekdays:
-                    todo_responses.append(todo)
-                    break  # 이미 추가했으므로 나머지는 건너뜀
-
-                current_date += timedelta(days=1)
-
-    return todo_responses

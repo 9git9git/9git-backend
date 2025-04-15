@@ -1,7 +1,8 @@
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from uuid import UUID
-from datetime import datetime
+from datetime import date
 from typing import List
 from app.models.category import Memo
 from app.schemas.memo import MemoCreate, MemoResponse, MemoUpdate
@@ -41,28 +42,19 @@ async def read_memo_by_id(
     return db_memo.scalars().first()
 
 
-async def read_memos_by_date(
-    db: AsyncSession, user_id: UUID, date: datetime
-) -> List[MemoResponse]:
-    db_memo = await db.execute(
-        select(Memo).where(
-            Memo.user_id == user_id, Memo.start_date <= date, date <= Memo.end_date
-        )
-    )
-    return db_memo.scalars().all()
-
-
 async def read_memos_by_period(
-    db: AsyncSession, user_id: UUID, start_date: datetime, end_date: datetime
+    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
 ) -> List[MemoResponse]:
     db_memo = await db.execute(
-        select(Memo).where(
+        select(Memo)
+        .options(selectinload(Memo.category))
+        .where(
             Memo.user_id == user_id,
-            Memo.start_date >= start_date,
-            Memo.end_date <= end_date,
+            Memo.start_date <= end_date,
+            Memo.end_date >= start_date,
         )
     )
-    return db_memo.scalars().all()
+    return db_memo.unique().scalars().all()
 
 
 async def read_memos_by_category_id(
@@ -70,24 +62,6 @@ async def read_memos_by_category_id(
 ) -> List[MemoResponse]:
     db_memo = await db.execute(
         select(Memo).where(Memo.user_id == user_id, Memo.category_id == category_id)
-    )
-    return db_memo.scalars().all()
-
-
-async def read_memos_by_period_and_category_id(
-    db: AsyncSession,
-    user_id: UUID,
-    category_id: UUID,
-    start_date: datetime,
-    end_date: datetime,
-) -> List[MemoResponse]:
-    db_memo = await db.execute(
-        select(Memo).where(
-            Memo.user_id == user_id,
-            Memo.category_id == category_id,
-            Memo.start_date >= start_date,
-            Memo.end_date <= end_date,
-        )
     )
     return db_memo.scalars().all()
 
