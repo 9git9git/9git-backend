@@ -2,9 +2,7 @@ from app.schemas.memo import MemoCreate, MemoResponse, MemoUpdate
 from app.crud.memo import (
     create_memo,
     read_memo_by_id,
-    read_memos_by_date,
     read_memos_by_period,
-    read_memos_by_period_and_category_id,
     update_memo,
     delete_memo,
 )
@@ -12,33 +10,13 @@ from typing import List
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
-from datetime import datetime, timedelta
+from datetime import date
 
 
-async def select_today_memos_service(
-    db: AsyncSession, user_id: UUID
+async def select_memos_by_period(
+    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
 ) -> List[MemoResponse]:
-    today = datetime.now().date()
-    return await read_memos_by_date(db, user_id, today)
-
-
-async def select_month_memos_service(
-    db: AsyncSession, user_id: UUID, year: int, month: int
-) -> List[MemoResponse]:
-
-    start_date = datetime(year, month, 1)
-    end_date = datetime(year, month + 1, 1) - timedelta(days=1)
     return await read_memos_by_period(db, user_id, start_date, end_date)
-
-
-async def select_month_memos_by_category_id_service(
-    db: AsyncSession, user_id: UUID, category_id: UUID, year: int, month: int
-) -> List[MemoResponse]:
-    start_date = datetime(year, month, 1)
-    end_date = datetime(year, month + 1, 1) - timedelta(days=1)
-    return await read_memos_by_period_and_category_id(
-        db, user_id, category_id, start_date, end_date
-    )
 
 
 async def add_memo_service(
