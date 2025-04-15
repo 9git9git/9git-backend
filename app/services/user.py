@@ -26,7 +26,7 @@ async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserInformationR
     result = await db.execute(
         select(User).options(selectinload(User.todos)).where(User.id == user_id)
     )
-    user = result.scalar_one_or_none()
+    user = result.scalars().first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="사용자를 찾을 수 없습니다."

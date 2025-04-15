@@ -38,11 +38,13 @@ async def get_users(
 async def get_user_by_id(user_id: UUID, db: AsyncSession = Depends(get_db)):
     try:
         user_info = await select_user_by_id(db, user_id)
-        return ResponseBase(status_code=200, data=user_info)
+        return ResponseBase(status_code=status.HTTP_200_OK, data=user_info)
     except HTTPException as e:
-        raise e
+        raise ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:
-        return ResponseBase(status_code=500, error=str(e))
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
 
 
 @router.get("/emails/{email}", response_model=ResponseBase[UserResponse])
