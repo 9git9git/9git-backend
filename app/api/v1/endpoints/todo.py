@@ -9,7 +9,7 @@ from app.services.todo import (
     add_todo,
     select_all_todos,
     select_todo_by_id,
-    select_todos_by_date_range,
+    select_todos_by_period,
     update_todo_by_id,
     delete_todo_service,
 )
@@ -57,15 +57,15 @@ async def get_all_todos(
 
 
 # 날짜 범위로 할 일 조회
-@router.get("/date-range", response_model=ResponseBase[List[TodoResponse]])
-async def get_todos_by_date_range(
+@router.get("/period", response_model=ResponseBase[List[TodoResponse]])
+async def get_todos_by_period(
     user_id: UUID,
     startDate: date = Query(..., description="시작 날짜 (YYYY-MM-DD)"),
     endDate: date = Query(..., description="종료 날짜 (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[List[TodoResponse]]:
     try:
-        todos = await select_todos_by_date_range(db, user_id, startDate, endDate)
+        todos = await select_todos_by_period(db, user_id, startDate, endDate)
         return ResponseBase(status_code=status.HTTP_200_OK, data=todos)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
