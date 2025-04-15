@@ -73,9 +73,6 @@ class Todo(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-    week_id: Mapped[Optional[UUID]] = mapped_column(
-        ForeignKey("weeks.id"), nullable=True
-    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
     end_date: Mapped[Date] = mapped_column(Date, nullable=False)
@@ -93,7 +90,9 @@ class Todo(Base):
     )
     # 관계: Todo 1 : N Week
     weeks: Mapped[Optional[List["app.models.week.Week"]]] = relationship(
-        "app.models.week.Week", back_populates="todo", foreign_keys="Todo.week_id"
+        "app.models.week.Week",
+        back_populates="todo",
+        foreign_keys="app.models.week.Week.todo_id",
     )
 
 
@@ -105,7 +104,6 @@ class Memo(Base):
     category_id: Mapped[UUID] = mapped_column(
         ForeignKey("categories.id"), nullable=False
     )
-
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     start_date: Mapped[Date] = mapped_column(Date, nullable=False)
