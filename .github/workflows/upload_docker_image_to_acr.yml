@@ -1,4 +1,4 @@
-name: Build and Push Backend Image to ACR
+name: Build, Push Backend Image to ACR and Trigger Deployment
 
 # 워크플로우 트리거 설정
 on:
@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest # 실행 환경 지정
+    outputs:
+      image_tag: ${{ steps.set_image_tag.outputs.image_tag }}
     steps:
       # 1. 소스 코드 체크아웃
       - name: Checkout repository
@@ -59,3 +61,39 @@ jobs:
           echo "Checking image in ACR..."
           echo "Basic tag information:"
           az acr repository show-tags --name ${{ secrets.ACR_LOGIN_SERVER }} --repository ${{ github.ref == 'refs/heads/dev' && secrets.ACR_REPOSITORY_NAME_TEST || secrets.ACR_REPOSITORY_NAME }} --output table
+
+      # 7. 다음 job에서 사용할 이미지 태그 설정 (SHA 태그 사용!)
+      - name: Set Image Tag Output (Using SHA)
+        id: set_image_tag # job outputs에서 참조하는 id와 일치해야 함
+        run: |
+          # metadata-action 출력에서 SHA 태그 추출
+          SHA_TAG=$(echo "${{ steps.meta.outputs.tags }}" | grep -oE '[a-f0-9]{7,40}' | head -n 1)
+          if [[ -z "$SHA_TAG" ]]; then
+            echo "Error: Could not extract SHA tag from metadata outputs."
+            exit 1
+          fi
+          # 조건부 리포지토리 이름 다시 확인
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            ACR_REPO_NAME_FOR_OUTPUT="${{ secrets.ACR_REPOSITORY_NAME }}"
+          else # dev 또는 기타
+            ACR_REPO_NAME_FOR_OUTPUT="${{ secrets.ACR_REPOSITORY_NAME_TEST }}"
+          fi
+          FULL_TAG="${{ secrets.ACR_LOGIN_SERVER }}/$ACR_REPO_NAME_FOR_OUTPUT:$SHA_TAG"
+          echo "Outputting image tag for deployment: $FULL_TAG"
+          echo "image_tag=$FULL_TAG" >> $GITHUB_OUTPUT
+
+  call-deploy-workflow:
+    name: Trigger ACA Deployment
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # main 또는 dev 브랜치에 push될 때만 배포 실행
+    if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'dev')
+
+    steps:
+      - name: Call Reusable Deployment Workflow
+        uses: 9git9git/9git-devops/.github/workflows/deploy_to_aca.yml@main
+        with:
+          image_tag: ${{ needs.build-and-push.outputs.image_tag }}
+          target_environment: ${{ (github.ref_name == 'main' && 'production') || 'test' }}
+          app_type: 'backend'
+        secrets: inherit
