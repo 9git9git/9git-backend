@@ -3,6 +3,7 @@ from datetime import date
 from typing import List, Optional
 from app.schemas.base import BaseModel
 from app.schemas.week import WeekCreate, WeekResponse
+from app.schemas.category import CategoryResponse
 
 
 # 요청: 할 일 생성용
@@ -26,6 +27,7 @@ class TodoResponse(BaseModel):
     is_completed: bool
     is_repeat: bool
     weeks: Optional[List[WeekResponse]] = None
+    category: Optional[CategoryResponse] = None
 
 
 # 요청: 할 일 수정용 (전부 Optional)

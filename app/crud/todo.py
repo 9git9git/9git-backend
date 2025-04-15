@@ -58,7 +58,9 @@ async def create_todo(
 # 특정 유저의 전체 할 일 목록 조회
 async def read_all_todos(db: AsyncSession, user_id: UUID) -> List[TodoResponse]:
     result = await db.execute(
-        select(Todo).options(selectinload(Todo.weeks)).where(Todo.user_id == user_id)
+        select(Todo)
+        .options(selectinload(Todo.weeks), selectinload(Todo.category))
+        .where(Todo.user_id == user_id)
     )
     return result.scalars().all()
 
@@ -69,7 +71,7 @@ async def read_todo_by_id(
 ) -> Optional[TodoResponse]:
     result = await db.execute(
         select(Todo)
-        .options(selectinload(Todo.weeks))
+        .options(selectinload(Todo.weeks), selectinload(Todo.category))
         .where(Todo.id == todo_id, Todo.user_id == user_id)
     )
     return result.scalars().first()
@@ -91,7 +93,7 @@ async def read_todos_by_user_and_category(
 ) -> List[TodoResponse]:
     result = await db.execute(
         select(Todo)
-        .options(selectinload(Todo.weeks))
+        .options(selectinload(Todo.weeks), selectinload(Todo.category))
         .where(Todo.user_id == user_id, Todo.category_id == category_id)
     )
     return result.scalars().all()
