@@ -52,7 +52,7 @@ async def get_chats_by_storage(
         )
 
 
-@router.get("/category/{category_id}", response_model=ResponseBase[List[ChatResponse]])
+@router.get("/", response_model=ResponseBase[List[ChatResponse]])
 async def get_chats_by_category(
     user_id: UUID,
     category_id: UUID,

@@ -1,3 +1,4 @@
+from uuid import main
 from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth,
@@ -13,6 +14,7 @@ from app.api.v1.endpoints import (
     chat,
     progress,
     todo,
+    main,
 )
 
 router = APIRouter()
@@ -53,7 +55,7 @@ router.include_router(
 )
 router.include_router(
     chat.router,
-    prefix="/users/{user_id}",
+    prefix="/users/{user_id}/categories/{category_id}/chats",
     tags=["chats"],
 )
 router.include_router(
@@ -65,3 +67,4 @@ router.include_router(
     prefix="/users/{user_id}/categories/{category_id}/todos",
     tags=["todos"],
 )
+router.include_router(main.router, prefix="/users/{user_id}", tags=["main"])
