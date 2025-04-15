@@ -1,15 +1,16 @@
 from app.schemas.base import BaseModel
 from uuid import UUID
+from app.enum.week import WeekdayEnum
 
 
 class WeekCreate(BaseModel):
-    weekName: str
+    weekName: WeekdayEnum
 
 
 class WeekResponse(BaseModel):
     id: UUID
-    week_name: str
+    week_name: WeekdayEnum
 
 
 class WeekUpdate(BaseModel):
-    weekName: str
+    weekName: WeekdayEnum
