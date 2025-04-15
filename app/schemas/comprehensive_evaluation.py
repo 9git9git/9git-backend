@@ -19,6 +19,7 @@ class ComprehensiveEvaluationResponse(BaseModel):
     strength_achievement_rate: float
     strength_text: str
     improvement_achievement_rate: float
+    improvementText: str
 
 
 class ComprehensiveEvaluationUpdate(BaseModel):
@@ -27,3 +28,4 @@ class ComprehensiveEvaluationUpdate(BaseModel):
     strengthAchievementRate: float
     strengthText: str
     improvementAchievementRate: float
+    improvementText: str
