@@ -1,5 +1,6 @@
 from app.schemas.base import BaseModel
 from uuid import UUID
+from typing import Optional
 
 
 class ComprehensiveEvaluationCreate(BaseModel):
@@ -15,11 +16,11 @@ class ComprehensiveEvaluationResponse(BaseModel):
     id: UUID
     user_id: UUID
     overall_achievement_rate: float
-    evaluation_text: str
+    evaluation_text: Optional[str] = None
     strength_achievement_rate: float
-    strength_text: str
+    strength_text: Optional[str] = None
     improvement_achievement_rate: float
-    improvementText: str
+    improvementText: Optional[str] = None
 
 
 class ComprehensiveEvaluationUpdate(BaseModel):
