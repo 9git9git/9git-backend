@@ -1,5 +1,6 @@
-from sqlalchemy import Enum as SqlEnum
+from sqlalchemy import Enum as SqlEnum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from uuid import UUID
 from typing import Optional
 from .base import Base
 from app.enum.week import WeekdayEnum
@@ -12,7 +13,9 @@ class Week(Base):
     week_name: Mapped[WeekdayEnum] = mapped_column(
         SqlEnum(WeekdayEnum, name="week_name_enums"), nullable=False
     )
-
+    todo_id: Mapped[UUID] = mapped_column(
+        ForeignKey("todos.id"), nullable=False, primary_key=True
+    )
     # 관계: Week N : 1 Todo (하나의 할 일이 하나의 요일을 갖고, 여러 Todo가 같은 요일을 가질 수 있음)
     todo: Mapped[Optional["app.models.category.Todo"]] = relationship(
         "app.models.category.Todo", back_populates="weeks"
