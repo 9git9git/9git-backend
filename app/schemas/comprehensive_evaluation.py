@@ -20,7 +20,7 @@ class ComprehensiveEvaluationResponse(BaseModel):
     strength_achievement_rate: float
     strength_text: Optional[str] = None
     improvement_achievement_rate: float
-    improvementText: Optional[str] = None
+    improvement_text: Optional[str] = None
 
 
 class ComprehensiveEvaluationUpdate(BaseModel):
