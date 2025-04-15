@@ -50,12 +50,6 @@ jobs:
           push: true # 빌드 후 푸시 실행
           tags: ${{ steps.meta.outputs.tags }} # 위 metadata step에서 생성된 태그 사용
           labels: ${{ steps.meta.outputs.labels }} # 위 metadata step에서 생성된 라벨 사용
-          secrets: |
-            "SYNC_DATABASE_URL=${{ secrets.SYNC_DATABASE_URL }}"
-            "ASYNC_DATABASE_URL=${{ secrets.ASYNC_DATABASE_URL }}"
-            "DB_ECHO_LOG=${{ github.ref == 'refs/heads/dev' && 'True' || 'False' }}"
-            "SECRET_KEY=${{ secrets.SECRET_KEY }}"
-            "IS_SECURE=${{ secrets.IS_SECURE }}"
 
       # 6. ACR에 푸시된 이미지 확인
       - name: Verify pushed image
