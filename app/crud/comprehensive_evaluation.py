@@ -24,6 +24,7 @@ async def create_comprehensive_evaluation(
         strength_achievement_rate=comprehensive_evaluation.strengthAchievementRate,
         strength_text=comprehensive_evaluation.strengthText,
         improvement_achievement_rate=comprehensive_evaluation.improvementAchievementRate,
+        improvement_text=comprehensive_evaluation.improvementText,
     )
 
     db.add(db_comprehensive_evaluation)
