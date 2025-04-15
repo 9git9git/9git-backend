@@ -24,7 +24,7 @@ async def add_todo(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Todo 생성 중 오류가 발생했습니다.",
+            detail=str(e),
         ) from e
 
 
@@ -79,5 +79,5 @@ async def delete_todo_service(db: AsyncSession, user_id: UUID, todo_id: UUID) ->
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Todo 삭제 중 오류가 발생했습니다.",
+            detail=str(e),
         ) from e
