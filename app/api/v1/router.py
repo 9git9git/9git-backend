@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     recommended_challenge,
     week,
     chat,
+    progress,
 )
 
 router = APIRouter()
@@ -53,4 +54,7 @@ router.include_router(
     chat.router,
     prefix="/users/{user_id}",
     tags=["chats"],
+)
+router.include_router(
+    progress.router, prefix="/ users/{user_id}/progresses", tags=["Progress"]
 )
