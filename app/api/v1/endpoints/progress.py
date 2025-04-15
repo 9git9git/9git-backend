@@ -36,10 +36,11 @@ async def post_progress(
 
 @router.get("/", response_model=ResponseBase[List[ProgressResponse]])
 async def get_all_progresses(
+    user_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[List[ProgressResponse]]:
     try:
-        progresses = await select_all_progresses(db)
+        progresses = await select_all_progresses(db, user_id)
         return ResponseBase(status_code=status.HTTP_200_OK, data=progresses)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)

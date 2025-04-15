@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from typing import List
+from datetime import date
 
 from app.schemas.todo import TodoCreate, TodoUpdate, TodoResponse
 from app.crud.todo import (
@@ -12,6 +13,7 @@ from app.crud.todo import (
     update_todo,
     delete_todo,
     read_todos_by_user_and_category,
+    read_todos_by_date_range,
 )
 
 
@@ -51,6 +53,19 @@ async def select_todos_by_user_and_category(
     db: AsyncSession, user_id: UUID, category_id: UUID
 ) -> List[TodoResponse]:
     return await read_todos_by_user_and_category(db, user_id, category_id)
+
+
+# ✅ 날짜 범위로 할 일 조회 (반복 요일 고려)
+async def select_todos_by_date_range(
+    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
+) -> List[TodoResponse]:
+    try:
+        return await read_todos_by_date_range(db, user_id, start_date, end_date)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"할 일 조회 중 오류가 발생했습니다: {str(e)}",
+        ) from e
 
 
 # ✅ 할 일 수정
