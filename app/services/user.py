@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from app.utils.hashed import get_password_hash
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.user import (
     read_users,
@@ -37,6 +38,8 @@ async def register_user(db: AsyncSession, user_data: UserCreate) -> UserResponse
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="이미 존재하는 이메일입니다.",
         )
+    user_data.password = get_password_hash(user_data.password)
+
     return await create_user(db, user_data)
 
 
