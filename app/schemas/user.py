@@ -30,3 +30,7 @@ class UserUpdate(BaseModel):
     level: int
     exp: int
     character_count: int
+
+
+class UserInformationResponse(UserResponse):
+    completed_todo_count: int
