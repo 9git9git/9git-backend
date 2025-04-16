@@ -18,11 +18,37 @@ from app.crud.todo import (
 )
 
 
+async def validate_todo(
+    todo_data: TodoCreate,
+) -> None:
+
+    # 기간 시작일과 종료일 비교
+    if todo_data.startDate > todo_data.endDate:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="시작일은 종료일보다 이전이어야 합니다.",
+        )
+
+    # 반복 여부에 따른 weeks 컬럼 체크
+    if todo_data.isRepeat and not todo_data.weeks:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="반복 설정 시 요일 정보가 필요합니다.",
+        )
+
+    if not todo_data.isRepeat and todo_data.weeks:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="반복하지 않는 할 일에는 요일 정보가 불필요합니다.",
+        )
+
+
 # ✅ 할 일 생성
 async def add_todo(
     db: AsyncSession, user_id: UUID, category_id: UUID, todo_data: TodoCreate
 ) -> TodoResponse:
     try:
+        await validate_todo(todo_data)
         return await create_todo(db, user_id, category_id, todo_data)
     except Exception as e:
         raise HTTPException(
@@ -117,6 +143,7 @@ async def update_todo_by_id(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Todo를 찾을 수 없습니다.",
         )
+    await validate_todo(todo_data)
     return await update_todo(db, todo, todo_data)
 
 

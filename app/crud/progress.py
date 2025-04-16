@@ -20,7 +20,15 @@ async def create_progress(
     db.add(progress)
     await db.commit()
     await db.refresh(progress)
-    return progress
+    return ProgressResponse(
+        id=progress.id,
+        user_id=progress.user_id,
+        category_id=progress.category_id,
+        progress_rate=progress.progress_rate,
+        start_date=progress.start_date,
+        end_date=progress.end_date,
+        category=None,
+    )
 
 
 # 전체 진행 조회
@@ -43,6 +51,17 @@ async def read_progress_by_id(
         select(Progress)
         .options(selectinload(Progress.category))
         .where(Progress.id == progress_id)
+    )
+    return result.scalars().first()
+
+
+async def read_progress_by_user_and_category(
+    db: AsyncSession, user_id: UUID, category_id: UUID
+) -> Optional[ProgressResponse]:
+    result = await db.execute(
+        select(Progress)
+        .options(selectinload(Progress.category))
+        .where(Progress.user_id == user_id, Progress.category_id == category_id)
     )
     return result.scalars().first()
 
