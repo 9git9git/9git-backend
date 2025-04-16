@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.user import UserResponse, UserUpdate, UserInformationResponse
 from app.schemas.base import ResponseBase
 from app.services.user import (
     select_users,
@@ -33,16 +33,14 @@ async def get_users(
         )
 
 
-@router.get("/{user_id}", response_model=ResponseBase[UserResponse])
-async def get_user_by_id(
-    user_id: UUID,
-    db: AsyncSession = Depends(get_db),
-) -> ResponseBase[UserResponse]:
+# 프론트엔드에서 사용할 유저 정보 조회 API
+@router.get("/{user_id}", response_model=ResponseBase[UserInformationResponse])
+async def get_user_by_id(user_id: UUID, db: AsyncSession = Depends(get_db)):
     try:
-        user = await select_user_by_id(db, user_id)
-        return ResponseBase(status_code=status.HTTP_200_OK, data=user)
+        user_info = await select_user_by_id(db, user_id)
+        return ResponseBase(status_code=status.HTTP_200_OK, data=user_info)
     except HTTPException as e:
-        return ResponseBase(status_code=e.status_code, error=e.detail)
+        raise ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:
         return ResponseBase(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)

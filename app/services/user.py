@@ -1,6 +1,8 @@
 from fastapi import HTTPException, status
 from app.utils.hashed import get_password_hash
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.crud.user import (
     read_users,
     create_user,
@@ -9,18 +11,38 @@ from app.crud.user import (
     read_user_by_id,
     read_user_by_email,
 )
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import (
+    UserCreate,
+    UserResponse,
+    UserUpdate,
+    UserInformationResponse,
+)
 from typing import List
 from uuid import UUID
+from app.models.user import User
 
 
-async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserResponse:
-    user = await read_user_by_id(db, user_id)
+async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserInformationResponse:
+    result = await db.execute(
+        select(User).options(selectinload(User.todos)).where(User.id == user_id)
+    )
+    user = result.scalars().first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="사용자를 찾을 수 없습니다."
         )
-    return user
+
+    completed_todo_count = sum(1 for todo in user.todos if todo.is_completed)
+
+    return UserInformationResponse(
+        id=user.id,
+        name=user.name,
+        email=user.email,
+        level=user.level,
+        exp=user.exp,
+        character_count=user.character_count,
+        completed_todo_count=completed_todo_count,
+    )
 
 
 async def select_user_by_email(db: AsyncSession, email: str) -> UserResponse:
