@@ -7,6 +7,7 @@ from app.services.character import (
     select_character_by_id,
     delete_character_by_id,
     update_character_by_id,
+    get_character_collection,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
@@ -93,4 +94,24 @@ async def delete_character(
     except Exception as e:
         return ResponseBase(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
+        )
+
+
+# 서비스 로직
+
+
+@router.get("/characters", response_model=ResponseBase[List[CharacterResponse]])
+async def get_user_character_collection(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> ResponseBase[List[CharacterResponse]]:
+    try:
+        characters = await get_character_collection(db, user_id)
+        return ResponseBase(status_code=status.HTTP_200_OK, data=characters)
+    except HTTPException as e:
+        return ResponseBase(status_code=e.status_code, error=e.detail)
+    except Exception as e:
+        return ResponseBase(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            error="캐릭터 도감 조회 중 서버 오류가 발생했습니다.",
         )

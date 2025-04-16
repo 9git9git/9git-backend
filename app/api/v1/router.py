@@ -21,7 +21,6 @@ router = APIRouter()
 
 router.include_router(auth.router, prefix="/auth", tags=["auth"])
 router.include_router(user.router, prefix="/users", tags=["users"])
-router.include_router(character.router, prefix="/characters", tags=["characters"])
 router.include_router(
     user_character.router, prefix="/user_characters", tags=["user_characters"]
 )
@@ -68,3 +67,13 @@ router.include_router(
     tags=["todos"],
 )
 router.include_router(main.router, prefix="/users/{user_id}", tags=["main"])
+
+# 일반 캐릭터 CRUD
+router.include_router(character.router, prefix="/characters", tags=["characters"])
+
+# 유저 도감 전용 API (GET /users/{user_id}/characters)
+router.include_router(
+    character.router,
+    prefix="/users/{user_id}",
+    tags=["user_characters"],  # or "characters" if you want to group together
+)
