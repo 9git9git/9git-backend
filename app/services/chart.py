@@ -6,7 +6,6 @@ from app.models.category import Todo, Category
 from app.schemas.chart import DailyAchievementResponse
 from collections import defaultdict
 from typing import List
-from datetime import date
 
 
 async def get_daily_achievement(
