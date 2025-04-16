@@ -159,15 +159,46 @@ async def get_goal_challenges(user_id: str, goal: str):
         return {"error": f"❌ goal '{goal}'은 지원되지 않음"}
 
     query = f"""
-    SELECT t.content, t.is_completed, t.start_date, t.end_date
+    SELECT 
+        t.content, 
+        t.is_completed, 
+        t.start_date, 
+        t.end_date,
+        c.id as category_id
     FROM todos t
     JOIN categories c ON t.category_id = c.id
+    LEFT JOIN progresses p ON p.category_id = c.id AND p.user_id = t.user_id
     WHERE t.user_id = '{user_id}' AND c.category_name = '{category_enum}'
       AND (t.start_date >= CURRENT_DATE - INTERVAL '6 months' OR t.end_date >= CURRENT_DATE - INTERVAL '6 months')
     ORDER BY t.start_date DESC;
     """
 
     results = db.run(query)
+    print("🎯 도전과제 SQL 쿼리 결과:", results)  # 결과 확인용
+
+    category_id = None
+
+    if isinstance(results, str):
+        try:
+            import re
+
+            # UUID 패턴을 찾기 위한 정규식
+            uuid_pattern = (
+                r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            )
+            uuids = re.findall(uuid_pattern, results.lower())
+            if len(uuids) >= 2:
+                category_id = uuids[0]
+        except:
+            pass
+    elif results and len(results) > 0:
+        try:
+            # 결과가 튜플이나 리스트 형태인 경우
+            first_row = results[0]
+            if len(first_row) >= 6:  # 최소 6개의 컬럼이 있어야 함
+                category_id = str(first_row[4]) if first_row[4] else None
+        except:
+            pass
 
     prompt = PromptTemplate.from_template(
         """
@@ -195,10 +226,12 @@ async def get_goal_challenges(user_id: str, goal: str):
       "reason": "...",   ← 배경 설명 없이 추천 이유만 간단히
       "motivation": "...",   ← 실천 유도 문장 위주, 핵심만 작성
       "duration": "...",
-      "difficulty": "하/중/상"
+      "difficulty": "하/중/상",
+      "category_id": "{category_id}"
     }}
+    ```
     """
     )
-    formatted = prompt.format(goal=goal, todo_info=results)
+    formatted = prompt.format(goal=goal, todo_info=results, category_id=category_id)
     response = llm.invoke(formatted)
     return extract_json(response.content, f"{goal}_challenge")
