@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.schemas.base import ResponseBase
-from app.schemas.chat import ChatCreate, ChatUpdate, ChatResponse
+from app.schemas.chat import ChatCreate, ChatUpdate, ChatResponse, ChatWithModelResponse
 from app.services.chat import (
     select_chat,
     select_chats_by_user,
@@ -86,17 +86,17 @@ async def get_chat(
         )
 
 
-@router.post("/", response_model=ResponseBase[ChatResponse])
+@router.post("/", response_model=ResponseBase[ChatWithModelResponse])
 async def post_chat(
     user_id: UUID,
     storage_id: UUID,
     category_id: UUID,
     chat_data: ChatCreate,
     db: AsyncSession = Depends(get_db),
-) -> ResponseBase[ChatResponse]:
+) -> ResponseBase[ChatWithModelResponse]:
     try:
-        chat = await add_chat(db, user_id, storage_id, category_id, chat_data)
-        return ResponseBase(status_code=status.HTTP_201_CREATED, data=chat)
+        chat_result = await add_chat(db, user_id, storage_id, category_id, chat_data)
+        return ResponseBase(status_code=status.HTTP_201_CREATED, data=chat_result)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
     except Exception as e:

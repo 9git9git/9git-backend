@@ -1,10 +1,21 @@
 from uuid import UUID
 from typing import List
 from sqlalchemy import select, delete
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.chat import Chat
-from app.schemas.chat import ChatCreate, ChatUpdate, ChatResponse
+from app.models.category import Category
+from app.schemas.chat import (
+    ChatCreate,
+    ChatUpdate,
+    ChatResponse,
+    ModelResponse,
+    ChatWithModelResponse,
+)
+from app.enum.chat import RoleEnum
 from app.utils.to_snake_case import camel_to_snake
+from app.utils.chat_model_selector import route_to_model
+from app.enum.category import CategoryNameEnum
 
 
 # 생성
@@ -14,20 +25,49 @@ async def create_chat(
     storage_id: UUID,
     category_id: UUID,
     chat_data: ChatCreate,
-) -> ChatResponse:
+) -> ChatWithModelResponse:
 
-    new_chat = Chat(
+    user_chat = Chat(  # 사용자 질문 저장
         user_id=user_id,
         storage_id=storage_id,
         category_id=category_id,
         role=chat_data.role,
         content=chat_data.content,
     )
-
-    db.add(new_chat)
+    db.add(user_chat)
     await db.commit()
-    await db.refresh(new_chat)
-    return new_chat
+    await db.refresh(user_chat)
+
+    chat_with_category = await db.execute(
+        select(Chat).options(joinedload(Chat.category)).where(Chat.id == user_chat.id)
+    )
+    chat_with_category = chat_with_category.scalars().first()
+
+    if chat_data.role == RoleEnum.USER:
+        category_enum = CategoryNameEnum(chat_with_category.category.category_name)
+
+        model_func = route_to_model(category_enum)
+        gpt_response = model_func(chat_data.content)
+
+        assistant_chat = Chat(  # assistant 응답 저장
+            user_id=user_id,
+            storage_id=storage_id,
+            category_id=category_id,
+            role=RoleEnum.ASSISTANT,
+            content=gpt_response,
+        )
+        db.add(assistant_chat)
+        await db.commit()
+        await db.refresh(assistant_chat)
+
+        return ChatWithModelResponse(
+            chat=user_chat, model_response=ModelResponse(content=gpt_response)
+        )
+
+    # assistant 응답이 아닌 경우 (예외적으로)
+    return ChatWithModelResponse(
+        chat=user_chat, model_response=ModelResponse(content="")
+    )
 
 
 # 단일 채팅 조회

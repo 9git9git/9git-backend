@@ -1,6 +1,6 @@
 from uuid import UUID
 from app.schemas.base import BaseModel
-from app.enum.chat import RoleEnum  # RoleEnum이 정의된 경로에 맞게 조정 필요
+from app.enum.chat import RoleEnum
 
 
 # 생성
@@ -17,6 +17,16 @@ class ChatResponse(BaseModel):
     category_id: UUID
     role: RoleEnum
     content: str
+
+
+class ModelResponse(BaseModel):
+    role: RoleEnum = RoleEnum.ASSISTANT
+    content: str
+
+
+class ChatWithModelResponse(BaseModel):
+    chat: ChatResponse
+    model_response: ModelResponse
 
 
 # 수정
