@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from app.crud.user_character import (
     create_user_character,
     read_user_character_by_user_id_and_character_id,
@@ -20,6 +21,19 @@ from uuid import UUID
 async def add_user_character(
     db: AsyncSession, user_character_data: UserCharacterCreate
 ) -> UserCharacterResponse:
+    # 중복 여부 확인
+    existing = await read_user_character_by_user_id_and_character_id(
+        db,
+        user_id=user_character_data.user_id,
+        character_id=user_character_data.character_id,
+    )
+
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="이미 수집한 캐릭터입니다."
+        )
+
+    # 중복 없으면 생성 진행
     return await create_user_character(db, user_character_data)
 
 
