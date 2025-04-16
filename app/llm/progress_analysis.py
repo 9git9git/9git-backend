@@ -40,6 +40,20 @@ async def get_user_summary(user_id: str):
     """
 
     result = db.run(query)
+    print("🎯 SQL 쿼리 결과:", result)  # 결과 확인용
+
+    if isinstance(result, str):
+        try:
+            import re
+
+            numbers = re.findall(r"\d+\.?\d*", result)
+            progress_data = float(numbers[0]) if numbers else 0.0
+        except:
+            progress_data = 0.0
+    else:
+        progress_data = float(result[0][0]) if result and result[0] else 0.0
+
+    progress_data = round(progress_data, 2)
 
     prompt = PromptTemplate.from_template(
         """
@@ -57,11 +71,13 @@ async def get_user_summary(user_id: str):
     아래 JSON 형식으로 출력하세요:
     ```json
     {{
+      "overall_achievement_rate": {progress_data},
       "summary": "..."
     }}
+    ```
     """
     )
-    formatted = prompt.format(progress_data=result)
+    formatted = prompt.format(progress_data=progress_data)
     response = llm.invoke(formatted)
     return extract_json(response.content, "summary")
 
