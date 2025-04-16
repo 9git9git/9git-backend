@@ -57,7 +57,7 @@ async def get_user_summary(user_id: str):
 
     prompt = PromptTemplate.from_template(
         """
-    당신은 목표 달성률을 기반으로 희망적인 복사정의 기준문장을 생성하는 AI입니다.
+    당신은 목표 달성률을 기반으로 희망적인 문장을 생성하는 AI입니다.
 
     - 평균 달성률 수치를 기반으로 하되, 사용자가 성취에 대한 자신감을 가질 수 있도록 유도해야함.
     - '사용자'는 표현은 제외하고 계속해서 자연스러운 문장으로 작성되어야함.
@@ -96,6 +96,29 @@ async def get_strength_weakness(user_id: str):
     """
 
     results = db.run(query)
+    print("🎯 강점/개선점 SQL 쿼리 결과:", results)  # 결과 확인용
+
+    # 결과에서 가장 높은 달성률과 가장 낮은 달성률 추출
+    if isinstance(results, str):
+        try:
+            import re
+
+            numbers = re.findall(r"\d+\.?\d*", results)
+            strength_rate = float(numbers[0]) if numbers else 0.0
+            weakness_rate = float(numbers[-1]) if len(numbers) > 1 else 0.0
+        except:
+            strength_rate = 0.0
+            weakness_rate = 0.0
+    else:
+        if results and len(results) > 0:
+            strength_rate = float(results[0][1]) if len(results) > 0 else 0.0
+            weakness_rate = float(results[-1][1]) if len(results) > 0 else 0.0
+        else:
+            strength_rate = 0.0
+            weakness_rate = 0.0
+
+    strength_rate = round(strength_rate, 2)
+    weakness_rate = round(weakness_rate, 2)
 
     prompt = PromptTemplate.from_template(
         """
@@ -113,12 +136,17 @@ async def get_strength_weakness(user_id: str):
     아래 JSON 형식으로 출력하세요:
     ```json
     {{
+      "strength_rate": {strength_rate},
+      "weakness_rate": {weakness_rate},
       "strength": "...",
       "weakness": "..."
     }}
+    ```
     """
     )
-    formatted = prompt.format(ranked_goals=results)
+    formatted = prompt.format(
+        ranked_goals=results, strength_rate=strength_rate, weakness_rate=weakness_rate
+    )
     response = llm.invoke(formatted)
     return extract_json(response.content, "strength_weakness")
 
