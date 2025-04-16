@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from uuid import UUID
 
@@ -9,6 +10,8 @@ class StorageCreate(BaseModel):
 class StorageResponse(BaseModel):
     id: UUID
     title: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class StorageUpdate(BaseModel):
