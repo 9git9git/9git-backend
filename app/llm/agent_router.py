@@ -1,9 +1,16 @@
 from app.llm.tools import detect_intent, detect_goal_function
 from app.llm.goal_agents import (
-    get_english_response, get_coding_response, get_fitness_response,
-    get_english_question, get_coding_question,
-    get_english_info, get_coding_info, get_fitness_info,
-    get_english_mentalcare, get_coding_mentalcare, get_fitness_mentalcare,
+    get_english_response,
+    get_coding_response,
+    get_fitness_response,
+    get_english_question,
+    get_coding_question,
+    get_english_info,
+    get_coding_info,
+    get_fitness_info,
+    get_english_mentalcare,
+    get_coding_mentalcare,
+    get_fitness_mentalcare,
 )
 
 VALID_GOALS = ["영어", "코딩", "운동"]

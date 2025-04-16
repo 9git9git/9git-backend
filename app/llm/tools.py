@@ -5,7 +5,7 @@ from app.llm.llm_provider import get_agent
 # 프롬프트 템플릿
 # 사용자 입력을 4가지 유형 중 하나로 분류하기 위한 가이드
 INTENT_GUIDANCE = """
-다음은 사용자의 요청 유형을 분류하는 기준이야야. 분류는 반드시 다음 4개 중 하나로만 해줘줘:
+다음은 사용자의 요청 유형을 분류하는 기준이야. 분류는 반드시 다음 4개 중 하나로만 해줘줘:
 
 1. 피드백: 사용자의 활동이나 학습 결과에 대한 평가, 코칭, 잘하고 있는지 질문하는 경우
 2. 로드맵: 앞으로 무엇을 해야 할지, 계획/단계 추천을 요청하는 경우
@@ -28,20 +28,19 @@ GOAL_FUNCTION_GUIDANCE_TEMPLATE = """
 """
 
 
-
 # Intent 분석 함수 (대화 목적 분류)
 """
 사용자의 입력 문장을 기반으로 '의도(intent)'를 분류함.
 '피드백', '로드맵', '멘탈케어', '확장 요청' 중 하나로 분류됨
 """
+
+
 def detect_intent(user_input: str) -> str:
     llm = get_agent()
-    response = llm.invoke([
-        HumanMessage(content=INTENT_GUIDANCE),
-        HumanMessage(content=user_input)
-    ])
+    response = llm.invoke(
+        [HumanMessage(content=INTENT_GUIDANCE), HumanMessage(content=user_input)]
+    )
     return response.content.strip()
-
 
 
 # Goal Function 분석 함수 (특수 요청 분류)
@@ -49,11 +48,12 @@ def detect_intent(user_input: str) -> str:
 사용자의 입력 문장을 기반으로 목표(goal)에 맞는 요청의 유형을 분류
 '문제 생성', '정보 제공', '일반 요청' 중 하나로 응답
 """
+
+
 def detect_goal_function(user_input: str, goal: str) -> str:
     llm = get_agent()
     guidance = GOAL_FUNCTION_GUIDANCE_TEMPLATE.format(goal=goal)
-    response = llm.invoke([
-        HumanMessage(content=guidance),
-        HumanMessage(content=user_input)
-    ])
+    response = llm.invoke(
+        [HumanMessage(content=guidance), HumanMessage(content=user_input)]
+    )
     return response.content.strip()

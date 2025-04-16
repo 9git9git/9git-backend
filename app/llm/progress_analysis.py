@@ -9,8 +9,8 @@ llm = get_agent()
 
 db = SQLDatabase.from_uri(
     settings.SYNC_DATABASE_URL,
-    include_tables=	["progresses", "todos", "categories"],
-    sample_rows_in_table_info=2 # 테이블 구조 예시를 GPT가 이해하도록 제공
+    include_tables=["progresses", "todos", "categories"],
+    sample_rows_in_table_info=2,  # 테이블 구조 예시를 GPT가 이해하도록 제공
 )
 
 # 목표 한글 → DB ENUM 값 매핑
@@ -24,12 +24,11 @@ GOAL_TO_ENUM = {
 # GPT 응답 JSON 파싱 유틸 함수
 def extract_json(text: str, label: str):
     try:
-        start = text.index('{')
-        end = text.rindex('}') + 1
+        start = text.index("{")
+        end = text.rindex("}") + 1
         return json.loads(text[start:end])
     except Exception as e:
         return {"error": f"{label} JSON parse 실패", "raw": text}
-
 
 
 # 전체 목표 평균 달성률 요약
@@ -39,10 +38,11 @@ async def get_user_summary(user_id: str):
     FROM progresses
     WHERE user_id = '{user_id}';
     """
-    
+
     result = db.run(query)
-    
-    prompt = PromptTemplate.from_template("""
+
+    prompt = PromptTemplate.from_template(
+        """
     당신은 목표 달성률을 기반으로 희망적인 복사정의 기준문장을 생성하는 AI입니다.
 
     - 평균 달성률 수치를 기반으로 하되, 사용자가 성취에 대한 자신감을 가질 수 있도록 유도해야함.
@@ -59,11 +59,11 @@ async def get_user_summary(user_id: str):
     {{
       "summary": "..."
     }}
-    """)
+    """
+    )
     formatted = prompt.format(progress_data=result)
     response = llm.invoke(formatted)
     return extract_json(response.content, "summary")
-
 
 
 # 목표별 강점 & 개선점 분석
@@ -78,10 +78,11 @@ async def get_strength_weakness(user_id: str):
     )
     SELECT * FROM ranked_goals ORDER BY avg_rate DESC;
     """
-    
+
     results = db.run(query)
-    
-    prompt = PromptTemplate.from_template("""
+
+    prompt = PromptTemplate.from_template(
+        """
     당신은 목표별 평균 달성률을 분석하고, 가장 높은 항목은 강점으로, 가장 낮은 항목은 감정점으로 표현하는 AI입니다.
 
     요약 문장은 반드시 짧고 간결하게 작성할 것:
@@ -99,12 +100,11 @@ async def get_strength_weakness(user_id: str):
       "strength": "...",
       "weakness": "..."
     }}
-    """)
+    """
+    )
     formatted = prompt.format(ranked_goals=results)
     response = llm.invoke(formatted)
     return extract_json(response.content, "strength_weakness")
-
-
 
 
 # 목표별 도전과제 추천
@@ -113,7 +113,7 @@ async def get_goal_challenges(user_id: str, goal: str):
     category_enum = GOAL_TO_ENUM.get(goal, None)
     if category_enum is None:
         return {"error": f"❌ goal '{goal}'은 지원되지 않음"}
-    
+
     query = f"""
     SELECT t.content, t.is_completed, t.start_date, t.end_date
     FROM todos t
@@ -122,10 +122,11 @@ async def get_goal_challenges(user_id: str, goal: str):
       AND (t.start_date >= CURRENT_DATE - INTERVAL '6 months' OR t.end_date >= CURRENT_DATE - INTERVAL '6 months')
     ORDER BY t.start_date DESC;
     """
-    
+
     results = db.run(query)
-    
-    prompt = PromptTemplate.from_template("""
+
+    prompt = PromptTemplate.from_template(
+        """
     당신은 도전과제를 기획하는 전문가입니다.
 
     선택된 목표: '{goal}'
@@ -152,7 +153,8 @@ async def get_goal_challenges(user_id: str, goal: str):
       "duration": "...",
       "difficulty": "하/중/상"
     }}
-    """)
+    """
+    )
     formatted = prompt.format(goal=goal, todo_info=results)
     response = llm.invoke(formatted)
     return extract_json(response.content, f"{goal}_challenge")
