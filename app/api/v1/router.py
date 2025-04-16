@@ -15,6 +15,7 @@ from app.api.v1.endpoints import (
     progress,
     todo,
     main,
+    analyze,
 )
 
 router = APIRouter()
@@ -76,4 +77,9 @@ router.include_router(
     character.router,
     prefix="/users/{user_id}",
     tags=["user_characters"],  # or "characters" if you want to group together
+)
+router.include_router(
+    analyze.router,
+    prefix="/users/{user_id}/analyze",
+    tags=["analyze"],
 )
