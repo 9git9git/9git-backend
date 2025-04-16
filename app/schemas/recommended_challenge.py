@@ -15,7 +15,7 @@ class RecommendedChallengeCreate(BaseModel):
 # 응답
 class RecommendedChallengeResponse(BaseModel):
     id: UUID
-    progress_id: UUID
+    progress_rate: float
     challenge_task: str
     challenge_duration: str
     challenge_difficulty: str

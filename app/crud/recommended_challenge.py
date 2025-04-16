@@ -17,13 +17,11 @@ from app.utils.to_snake_case import camel_to_snake
 async def create_recommended_challenge(
     db: AsyncSession,
     user_id: UUID,
-    progress_id: UUID,
     category_id: UUID,
     challenge_data: RecommendedChallengeCreate,
 ) -> RecommendedChallengeResponse:
     db_challenge = RecommendedChallenge(
         user_id=user_id,
-        progress_id=progress_id,
         category_id=category_id,
         progress_rate=challenge_data.progressRate,
         challenge_task=challenge_data.challengeTask,
