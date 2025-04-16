@@ -1,11 +1,12 @@
-from uuid import UUID
 from app.schemas.base import BaseModel
+from uuid import UUID
+from datetime import datetime
+from typing import Optional
 
 
 class CharacterCreate(BaseModel):
-    characterName: str
-    level: int
-    imageLink: str
+    character_name: str
+    image_link: str
 
 
 class CharacterResponse(BaseModel):
@@ -13,9 +14,12 @@ class CharacterResponse(BaseModel):
     character_name: str
     level: int
     image_link: str
+    created_at: datetime
+    updated_at: datetime
+    is_collected: Optional[bool] = None
+    collected_date: Optional[datetime] = None
 
 
 class CharacterUpdate(BaseModel):
-    characterName: str
-    level: int
-    imageLink: str
+    character_name: str
+    image_link: str

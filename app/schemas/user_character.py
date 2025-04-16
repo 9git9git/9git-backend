@@ -6,8 +6,8 @@ from typing import Optional
 
 
 class UserCharacterCreate(BaseModel):
-    userId: UUID
-    characterId: UUID
+    user_id: UUID
+    character_id: UUID
 
 
 class UserCharacterResponse(BaseModel):
@@ -15,9 +15,9 @@ class UserCharacterResponse(BaseModel):
     user_id: UUID
     character_id: UUID
     character: Optional[CharacterResponse] = None
-    user: Optional[UserResponse] = None
+    # user: Optional[UserResponse] = None 응답때메 없애버리기
 
 
 class UserCharacterUpdate(BaseModel):
-    userId: UUID
-    characterId: UUID
+    user_id: UUID
+    character_id: UUID
