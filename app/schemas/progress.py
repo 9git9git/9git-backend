@@ -26,5 +26,3 @@ class TodayProgressResponse(BaseModel):
 
 class ProgressUpdate(BaseModel):
     progressRate: Decimal | None = None
-    startDate: date | None = None
-    endDate: date | None = None
