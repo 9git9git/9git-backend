@@ -1,5 +1,5 @@
 from app.models.week import Week
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from typing import List, Optional
@@ -7,6 +7,7 @@ from app.models.category import Todo
 from app.schemas.todo import TodoCreate, TodoUpdate, TodoResponse
 from sqlalchemy.orm import selectinload
 from app.utils.to_snake_case import camel_to_snake
+from datetime import date
 
 
 # 할 일 생성
@@ -85,6 +86,29 @@ async def read_raw_todo_by_id(
         select(Todo).where(Todo.id == todo_id, Todo.user_id == user_id)
     )
     return result.scalars().first()
+
+
+# 날짜 범위로 할 일 조회 (기본)
+async def read_todos_by_period(
+    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
+) -> List[Todo]:
+
+    # 해당 기간과 겹치는 모든 Todo 가져오기 (간소화된 조건)
+    query = (
+        select(Todo)
+        .options(selectinload(Todo.weeks), selectinload(Todo.category))
+        .where(
+            Todo.user_id == user_id,
+            # 모든 겹침 케이스를 처리하는 단일 조건
+            Todo.start_date <= end_date,
+            Todo.end_date >= start_date,
+        )
+    )
+
+    result = await db.execute(query)
+
+    # unique -> 조인 쿼리 시 중복 데이터 제거
+    return result.unique().scalars().all()
 
 
 # 특정 유저의 특정 카테고리에 속한 할 일 목록 조회

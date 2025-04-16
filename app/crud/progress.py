@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-
+from sqlalchemy.orm import selectinload
 from app.models.category import Progress
 from app.schemas.progress import ProgressCreate, ProgressUpdate, ProgressResponse
 
@@ -27,7 +27,11 @@ async def create_progress(
 async def read_all_progresses(
     db: AsyncSession, user_id: UUID
 ) -> List[ProgressResponse]:
-    result = await db.execute(select(Progress).where(Progress.user_id == user_id))
+    result = await db.execute(
+        select(Progress)
+        .options(selectinload(Progress.category))
+        .where(Progress.user_id == user_id)
+    )
     return result.scalars().all()
 
 
@@ -35,7 +39,11 @@ async def read_all_progresses(
 async def read_progress_by_id(
     db: AsyncSession, progress_id: UUID
 ) -> Optional[ProgressResponse]:
-    result = await db.execute(select(Progress).where(Progress.id == progress_id))
+    result = await db.execute(
+        select(Progress)
+        .options(selectinload(Progress.category))
+        .where(Progress.id == progress_id)
+    )
     return result.scalars().first()
 
 

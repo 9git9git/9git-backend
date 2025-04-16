@@ -1,7 +1,9 @@
+from typing import List, Optional
 from uuid import UUID
 from datetime import date
 from decimal import Decimal
 from app.schemas.base import BaseModel
+from app.schemas.category import CategoryResponse
 
 
 class ProgressCreate(BaseModel):
@@ -17,6 +19,13 @@ class ProgressResponse(BaseModel):
     progress_rate: Decimal
     start_date: date
     end_date: date
+    category: Optional[CategoryResponse] = None
+
+
+class TodayProgressResponse(BaseModel):
+    totalProgressRate: Decimal
+    cheerUpMessage: str
+    categoryProgresses: List[ProgressResponse]
 
 
 class ProgressUpdate(BaseModel):
