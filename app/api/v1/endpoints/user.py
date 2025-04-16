@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.user import UserResponse, UserUpdate, UserInformationResponse
+from app.schemas.user import UserResponse, UserUpdate
 from app.schemas.base import ResponseBase
 from app.services.user import (
     select_users,
@@ -34,7 +34,7 @@ async def get_users(
 
 
 # 프론트엔드에서 사용할 유저 정보 조회 API
-@router.get("/{user_id}", response_model=ResponseBase[UserInformationResponse])
+@router.get("/{user_id}", response_model=ResponseBase[UserResponse])
 async def get_user_by_id(user_id: UUID, db: AsyncSession = Depends(get_db)):
     try:
         user_info = await select_user_by_id(db, user_id)

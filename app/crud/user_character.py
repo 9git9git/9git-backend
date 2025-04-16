@@ -3,7 +3,6 @@ from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.user_character import (
     UserCharacterCreate,
-    UserCharacterResponse,
     UserCharacterUpdate,
 )
 from app.models.user import UserCharacter
@@ -47,7 +46,7 @@ async def read_user_characters(db: AsyncSession) -> List[UserCharacter]:
             selectinload(UserCharacter.character),
         )
     )
-    user_characters = result.scalars().all()
+    user_characters = result.unique().scalars().all()
     return user_characters
 
 
@@ -62,7 +61,7 @@ async def read_user_character_by_user_id(
             selectinload(UserCharacter.character),
         )
     )
-    user_characters = result.scalars().all()
+    user_characters = result.unique().scalars().all()
     return user_characters
 
 
@@ -77,7 +76,7 @@ async def read_user_character_by_character_id(
             selectinload(UserCharacter.character),
         )
     )
-    user_characters = result.scalars().all()
+    user_characters = result.unique().scalars().all()
     return user_characters
 
 
