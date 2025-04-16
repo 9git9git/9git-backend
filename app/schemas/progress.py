@@ -8,8 +8,6 @@ from app.schemas.category import CategoryResponse
 
 class ProgressCreate(BaseModel):
     categoryId: UUID
-    startDate: date
-    endDate: date
 
 
 class ProgressResponse(BaseModel):
@@ -17,8 +15,6 @@ class ProgressResponse(BaseModel):
     user_id: UUID
     category_id: UUID
     progress_rate: Decimal
-    start_date: date
-    end_date: date
     category: Optional[CategoryResponse] = None
 
 
