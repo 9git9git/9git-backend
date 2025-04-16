@@ -9,8 +9,8 @@ llm = get_agent()
 
 db = SQLDatabase.from_uri(
     settings.SYNC_DATABASE_URL,
-    include_tables=	["progresses", "todos", "categories"],
-    sample_rows_in_table_info=2 # 테이블 구조 예시를 GPT가 이해하도록 제공
+    include_tables=["progresses", "todos", "categories"],
+    sample_rows_in_table_info=2,  # 테이블 구조 예시를 GPT가 이해하도록 제공
 )
 
 # 목표 한글 → DB ENUM 값 매핑
@@ -24,12 +24,11 @@ GOAL_TO_ENUM = {
 # GPT 응답 JSON 파싱 유틸 함수
 def extract_json(text: str, label: str):
     try:
-        start = text.index('{')
-        end = text.rindex('}') + 1
+        start = text.index("{")
+        end = text.rindex("}") + 1
         return json.loads(text[start:end])
     except Exception as e:
         return {"error": f"{label} JSON parse 실패", "raw": text}
-
 
 
 # 전체 목표 평균 달성률 요약
@@ -39,11 +38,26 @@ async def get_user_summary(user_id: str):
     FROM progresses
     WHERE user_id = '{user_id}';
     """
-    
+
     result = db.run(query)
-    
-    prompt = PromptTemplate.from_template("""
-    당신은 목표 달성률을 기반으로 희망적인 복사정의 기준문장을 생성하는 AI입니다.
+    print("🎯 SQL 쿼리 결과:", result)  # 결과 확인용
+
+    if isinstance(result, str):
+        try:
+            import re
+
+            numbers = re.findall(r"\d+\.?\d*", result)
+            progress_data = float(numbers[0]) if numbers else 0.0
+        except:
+            progress_data = 0.0
+    else:
+        progress_data = float(result[0][0]) if result and result[0] else 0.0
+
+    progress_data = round(progress_data, 2)
+
+    prompt = PromptTemplate.from_template(
+        """
+    당신은 목표 달성률을 기반으로 희망적인 문장을 생성하는 AI입니다.
 
     - 평균 달성률 수치를 기반으로 하되, 사용자가 성취에 대한 자신감을 가질 수 있도록 유도해야함.
     - '사용자'는 표현은 제외하고 계속해서 자연스러운 문장으로 작성되어야함.
@@ -57,13 +71,15 @@ async def get_user_summary(user_id: str):
     아래 JSON 형식으로 출력하세요:
     ```json
     {{
+      "overall_achievement_rate": {progress_data},
       "summary": "..."
     }}
-    """)
-    formatted = prompt.format(progress_data=result)
+    ```
+    """
+    )
+    formatted = prompt.format(progress_data=progress_data)
     response = llm.invoke(formatted)
     return extract_json(response.content, "summary")
-
 
 
 # 목표별 강점 & 개선점 분석
@@ -78,10 +94,34 @@ async def get_strength_weakness(user_id: str):
     )
     SELECT * FROM ranked_goals ORDER BY avg_rate DESC;
     """
-    
+
     results = db.run(query)
-    
-    prompt = PromptTemplate.from_template("""
+    print("🎯 강점/개선점 SQL 쿼리 결과:", results)  # 결과 확인용
+
+    # 결과에서 가장 높은 달성률과 가장 낮은 달성률 추출
+    if isinstance(results, str):
+        try:
+            import re
+
+            numbers = re.findall(r"\d+\.?\d*", results)
+            strength_rate = float(numbers[0]) if numbers else 0.0
+            weakness_rate = float(numbers[-1]) if len(numbers) > 1 else 0.0
+        except:
+            strength_rate = 0.0
+            weakness_rate = 0.0
+    else:
+        if results and len(results) > 0:
+            strength_rate = float(results[0][1]) if len(results) > 0 else 0.0
+            weakness_rate = float(results[-1][1]) if len(results) > 0 else 0.0
+        else:
+            strength_rate = 0.0
+            weakness_rate = 0.0
+
+    strength_rate = round(strength_rate, 2)
+    weakness_rate = round(weakness_rate, 2)
+
+    prompt = PromptTemplate.from_template(
+        """
     당신은 목표별 평균 달성률을 분석하고, 가장 높은 항목은 강점으로, 가장 낮은 항목은 감정점으로 표현하는 AI입니다.
 
     요약 문장은 반드시 짧고 간결하게 작성할 것:
@@ -96,15 +136,19 @@ async def get_strength_weakness(user_id: str):
     아래 JSON 형식으로 출력하세요:
     ```json
     {{
+      "strength_rate": {strength_rate},
+      "weakness_rate": {weakness_rate},
       "strength": "...",
       "weakness": "..."
     }}
-    """)
-    formatted = prompt.format(ranked_goals=results)
+    ```
+    """
+    )
+    formatted = prompt.format(
+        ranked_goals=results, strength_rate=strength_rate, weakness_rate=weakness_rate
+    )
     response = llm.invoke(formatted)
     return extract_json(response.content, "strength_weakness")
-
-
 
 
 # 목표별 도전과제 추천
@@ -113,19 +157,51 @@ async def get_goal_challenges(user_id: str, goal: str):
     category_enum = GOAL_TO_ENUM.get(goal, None)
     if category_enum is None:
         return {"error": f"❌ goal '{goal}'은 지원되지 않음"}
-    
+
     query = f"""
-    SELECT t.content, t.is_completed, t.start_date, t.end_date
+    SELECT 
+        t.content, 
+        t.is_completed, 
+        t.start_date, 
+        t.end_date,
+        c.id as category_id
     FROM todos t
     JOIN categories c ON t.category_id = c.id
+    LEFT JOIN progresses p ON p.category_id = c.id AND p.user_id = t.user_id
     WHERE t.user_id = '{user_id}' AND c.category_name = '{category_enum}'
       AND (t.start_date >= CURRENT_DATE - INTERVAL '6 months' OR t.end_date >= CURRENT_DATE - INTERVAL '6 months')
     ORDER BY t.start_date DESC;
     """
-    
+
     results = db.run(query)
-    
-    prompt = PromptTemplate.from_template("""
+    print("🎯 도전과제 SQL 쿼리 결과:", results)  # 결과 확인용
+
+    category_id = None
+
+    if isinstance(results, str):
+        try:
+            import re
+
+            # UUID 패턴을 찾기 위한 정규식
+            uuid_pattern = (
+                r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            )
+            uuids = re.findall(uuid_pattern, results.lower())
+            if len(uuids) >= 2:
+                category_id = uuids[0]
+        except:
+            pass
+    elif results and len(results) > 0:
+        try:
+            # 결과가 튜플이나 리스트 형태인 경우
+            first_row = results[0]
+            if len(first_row) >= 6:  # 최소 6개의 컬럼이 있어야 함
+                category_id = str(first_row[4]) if first_row[4] else None
+        except:
+            pass
+
+    prompt = PromptTemplate.from_template(
+        """
     당신은 도전과제를 기획하는 전문가입니다.
 
     선택된 목표: '{goal}'
@@ -150,9 +226,12 @@ async def get_goal_challenges(user_id: str, goal: str):
       "reason": "...",   ← 배경 설명 없이 추천 이유만 간단히
       "motivation": "...",   ← 실천 유도 문장 위주, 핵심만 작성
       "duration": "...",
-      "difficulty": "하/중/상"
+      "difficulty": "하/중/상",
+      "category_id": "{category_id}"
     }}
-    """)
-    formatted = prompt.format(goal=goal, todo_info=results)
+    ```
+    """
+    )
+    formatted = prompt.format(goal=goal, todo_info=results, category_id=category_id)
     response = llm.invoke(formatted)
     return extract_json(response.content, f"{goal}_challenge")

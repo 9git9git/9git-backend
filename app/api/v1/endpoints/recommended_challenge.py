@@ -72,14 +72,13 @@ async def get_recommended_challenge(
 )
 async def post_recommended_challenge(
     user_id: UUID,
-    progress_id: UUID,
     category_id: UUID,
     challenge_data: RecommendedChallengeCreate,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[RecommendedChallengeResponse]:
     try:
         challenge = await add_recommended_challenge(
-            db, user_id, progress_id, category_id, challenge_data
+            db, user_id, category_id, challenge_data
         )
         return ResponseBase(status_code=status.HTTP_201_CREATED, data=challenge)
     except HTTPException as e:

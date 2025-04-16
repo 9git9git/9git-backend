@@ -47,13 +47,10 @@ async def select_recommended_challenges(
 async def add_recommended_challenge(
     db: AsyncSession,
     user_id: UUID,
-    progress_id: UUID,
     category_id: UUID,
     challenge_data: RecommendedChallengeCreate,
 ) -> RecommendedChallengeResponse:
-    return await create_recommended_challenge(
-        db, user_id, progress_id, category_id, challenge_data
-    )
+    return await create_recommended_challenge(db, user_id, category_id, challenge_data)
 
 
 # 수정
