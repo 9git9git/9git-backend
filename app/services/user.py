@@ -15,17 +15,23 @@ from app.schemas.user import (
     UserCreate,
     UserResponse,
     UserUpdate,
-    UserInformationResponse,
 )
 from typing import List
 from uuid import UUID
-from app.models.user import User
+from app.models.user import User, UserCharacter
+from app.schemas.character import CharacterResponse
 
 
-async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserInformationResponse:
+async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserResponse:
     result = await db.execute(
-        select(User).options(selectinload(User.todos)).where(User.id == user_id)
+        select(User)
+        .options(
+            selectinload(User.todos),
+            selectinload(User.user_characters).selectinload(UserCharacter.character),
+        )
+        .where(User.id == user_id)
     )
+
     user = result.scalars().first()
     if not user:
         raise HTTPException(
@@ -34,14 +40,31 @@ async def select_user_by_id(db: AsyncSession, user_id: UUID) -> UserInformationR
 
     completed_todo_count = sum(1 for todo in user.todos if todo.is_completed)
 
-    return UserInformationResponse(
+    return UserResponse(
         id=user.id,
-        name=user.name,
         email=user.email,
+        name=user.name,
+        sex=user.sex.value if user.sex else None,
+        age=user.age,
+        job=user.job,
         level=user.level,
         exp=user.exp,
         character_count=user.character_count,
         completed_todo_count=completed_todo_count,
+        characters=[
+            CharacterResponse(
+                id=uc.character.id,
+                character_name=uc.character.character_name,
+                level=uc.character.level,
+                image_link=uc.character.image_link,
+                created_at=uc.character.created_at,
+                updated_at=uc.character.updated_at,
+                is_collected=True,
+                collected_date=uc.created_at,
+            )
+            for uc in user.user_characters
+            if uc.character is not None
+        ],
     )
 
 

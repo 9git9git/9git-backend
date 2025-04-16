@@ -1,7 +1,8 @@
 from pydantic import EmailStr
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List
 from app.schemas.base import BaseModel
+from app.schemas.character import CharacterResponse
 from app.enum.user import GenderEnum
 
 
@@ -20,7 +21,9 @@ class UserResponse(BaseModel):
     job: Optional[str] = None
     level: Optional[int] = 1
     exp: Optional[int] = 0
+    completed_todo_count: Optional[int] = 0
     character_count: Optional[int] = 0
+    characters: Optional[List[CharacterResponse]] = []
 
 
 class UserUpdate(BaseModel):
@@ -30,7 +33,3 @@ class UserUpdate(BaseModel):
     level: int
     exp: int
     character_count: int
-
-
-class UserInformationResponse(UserResponse):
-    completed_todo_count: int
