@@ -14,7 +14,13 @@ class Settings(BaseSettings):
     # 쿠키 보안 설정
     IS_SECURE: bool
 
-    model_config = ConfigDict(env_file=".env", env_file_encoding='utf-8', extra="allow")
+    # Azure OpenAI API 설정
+    AZURE_OPENAI_API_KEY: str
+    AZURE_OPENAI_ENDPOINT: str
+    AZURE_OPENAI_DEPLOYMENT_NAME: str
+    AZURE_OPENAI_API_VERSION: str
+
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")
 
 
 settings = Settings()
