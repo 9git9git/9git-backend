@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     todo,
     main,
     analyze,
+    chart,
 )
 
 router = APIRouter()
@@ -82,4 +83,10 @@ router.include_router(
     analyze.router,
     prefix="/users/{user_id}/analyze",
     tags=["analyze"],
+)
+
+router.include_router(
+    chart.router,
+    prefix="/users/{user_id}",
+    tags=["Chart"],
 )
