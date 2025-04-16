@@ -4,6 +4,7 @@ from app.schemas.storage import StorageCreate, StorageResponse, StorageUpdate
 from app.models.chat import Storage
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
+from sqlalchemy.orm import selectinload
 
 
 async def create_storage(
@@ -19,16 +20,22 @@ async def create_storage(
     await db.commit()
     await db.refresh(db_storage)
 
-    return db_storage
+    return StorageResponse(
+        id=db_storage.id,
+        title=db_storage.title,
+        created_at=db_storage.created_at,
+        updated_at=db_storage.updated_at,
+        category=None,
+    )
 
 
 async def read_storages(
     db: AsyncSession, user_id: UUID, category_id: UUID
 ) -> List[StorageResponse]:
     result = await db.execute(
-        select(Storage).where(
-            Storage.user_id == user_id, Storage.category_id == category_id
-        )
+        select(Storage)
+        .options(selectinload(Storage.category))
+        .where(Storage.user_id == user_id, Storage.category_id == category_id)
     )
     return result.scalars().all()
 
@@ -37,7 +44,9 @@ async def read_storage_by_id(
     db: AsyncSession, user_id: UUID, category_id: UUID, storage_id: UUID
 ) -> Optional[StorageResponse]:
     result = await db.execute(
-        select(Storage).where(
+        select(Storage)
+        .options(selectinload(Storage.category))
+        .where(
             Storage.user_id == user_id,
             Storage.category_id == category_id,
             Storage.id == storage_id,
