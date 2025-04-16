@@ -14,8 +14,6 @@ async def create_progress(
     progress = Progress(
         user_id=user_id,
         category_id=progress_data.categoryId,
-        start_date=progress_data.startDate,
-        end_date=progress_data.endDate,
     )
     db.add(progress)
     await db.commit()
@@ -25,8 +23,6 @@ async def create_progress(
         user_id=progress.user_id,
         category_id=progress.category_id,
         progress_rate=progress.progress_rate,
-        start_date=progress.start_date,
-        end_date=progress.end_date,
         category=None,
     )
 

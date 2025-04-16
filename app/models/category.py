@@ -48,8 +48,6 @@ class Progress(Base):
         ForeignKey("categories.id"), nullable=False
     )
     progress_rate: Mapped[DECIMAL] = mapped_column(DECIMAL(5, 2), default=0.00)
-    start_date: Mapped[Date] = mapped_column(Date, nullable=False)
-    end_date: Mapped[Date] = mapped_column(Date, nullable=False)
 
     # 관계: Progress N : 1 User
     user: Mapped["app.models.user.User"] = relationship(
