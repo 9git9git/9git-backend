@@ -20,6 +20,9 @@ from app.services.recommended_challenge import (
     add_recommended_challenge,
     update_recommended_challenge_service,
 )
+from app.services.category import (
+    select_categories,
+)
 from app.services.ai import get_ai_analysis, get_goal_challenges_analysis
 
 
@@ -95,22 +98,48 @@ async def get_or_create_today_recommended_challenges(
     # 3. AI 분석 요청
     challenges_data = await get_goal_challenges_analysis(str(user_id))
 
+    # 카테고리 목록 가져오기
+    categories = await select_categories(db)
+    # 카테고리 이름을 키로, ID를 값으로 하는 딕셔너리 생성
+    category_map = {
+        str(category.category_name.value): category.id for category in categories
+    }
+
     # 4. 각 목표별로 추천 도전과제 생성
     created_challenges = []
     for goal, challenge_data in challenges_data.items():
-        new_challenge = RecommendedChallengeCreate(
-            progressRate=0.0,
-            challengeTask=challenge_data["title"],
-            challengeDuration=challenge_data["duration"],
-            challengeDifficulty=challenge_data["difficulty"],
-            challengeSuggestion=f"{challenge_data['reason']}\n{challenge_data['motivation']}",
-        )
-
+        progress_rate = 0.0
         # AI 분석 결과에서 받은 ID 사용
         try:
             category_id = UUID(str(challenge_data.get("category_id", "")))
         except (ValueError, TypeError):
             category_id = None
+
+        # category_id가 None이거나 유효하지 않은 경우, 목표 이름에 따라 카테고리 매핑
+        if category_id is None or category_id not in category_map.values():
+            # 목표 이름과 카테고리 이름의 유사도를 기반으로 매핑
+            # 예: "운동하기" -> "운동", "영어공부" -> "영어"
+            matched_category = None
+            for category_name, category_id in category_map.items():
+                if category_name in goal or goal in category_name:
+                    matched_category = category_id
+                    break
+
+            # 매칭되는 카테고리가 없으면 첫 번째 카테고리를 기본값으로 사용
+            category_id = (
+                matched_category
+                if matched_category
+                else next(iter(category_map.values()))
+            )
+            progress_rate = -1.0
+
+        new_challenge = RecommendedChallengeCreate(
+            progressRate=progress_rate,
+            challengeTask=challenge_data["title"],
+            challengeDuration=challenge_data["duration"],
+            challengeDifficulty=challenge_data["difficulty"],
+            challengeSuggestion=f"{challenge_data['reason']}\n{challenge_data['motivation']}",
+        )
 
         created_challenge = await add_recommended_challenge(
             db, user_id, category_id, new_challenge
