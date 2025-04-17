@@ -15,6 +15,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.models.user import UserCharacter
 from app.models.user import Character as CharacterModel
+from uuid import uuid4
+from datetime import datetime
 
 
 async def add_character(
@@ -79,9 +81,6 @@ async def delete_character_by_id(db: AsyncSession, character_id: UUID) -> bool:
 
 
 # 서비스 로직
-from app.models.user import UserCharacter
-from uuid import uuid4
-from datetime import datetime
 
 
 async def register_user_character(
