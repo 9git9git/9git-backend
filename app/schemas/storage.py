@@ -5,14 +5,11 @@ from pydantic import BaseModel, Field
 from uuid import UUID
 from typing import Optional
 from datetime import datetime
-import pytz
-
-kst = pytz.timezone("Asia/Seoul")
 
 
 class StorageCreate(BaseModel):
     title: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(kst))
+    created_at: datetime
 
 
 class StorageResponse(BaseModel):

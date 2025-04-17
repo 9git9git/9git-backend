@@ -34,6 +34,7 @@ async def create_chat(
         category_id=category_id,
         role=chat_data.role,
         content=chat_data.content,
+        created_at=chat_data.created_at,
     )
     db.add(user_chat)
     await db.commit()

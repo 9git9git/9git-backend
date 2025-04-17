@@ -1,18 +1,14 @@
 from uuid import UUID
-from pydantic import Field
 from app.schemas.base import BaseModel
 from datetime import datetime
 from app.enum.chat import RoleEnum
-import pytz
-
-kst = pytz.timezone("Asia/Seoul")
 
 
 # 생성
 class ChatCreate(BaseModel):
     role: RoleEnum
     content: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(kst))
+    created_at: datetime
 
 
 # 응답

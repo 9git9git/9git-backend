@@ -78,7 +78,7 @@ def upload_to_index(index_name: str, data: dict):
     }
 
     # url = f"{search_endpoint}/indexes/{index_name}/docs/index?api-version={search_api_version}"
-    url = f"{search_endpoint}/indexes/{index_name}/docs/index?api-version=2025-03-01-preview"
+    url = f"{search_endpoint}/indexes/{index_name}/docs/search?api-version=2023-07-01-preview"
     res = requests.post(url, headers=HEADERS, json=doc)
 
     # 결과 확인 및 출력
