@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from typing import List, Optional
 from uuid import UUID
 from sqlalchemy import select, delete
@@ -49,8 +50,14 @@ async def read_category_by_name(
 
 # 카테고리 수정
 async def update_category(
-    db: AsyncSession, db_category: Category, category_data: CategoryUpdate
+    db: AsyncSession, category_id: UUID, category_data: CategoryUpdate
 ) -> CategoryResponse:
+    db_category = await read_category_by_id(db, category_id)
+    if not db_category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="카테고리를 찾을 수 없습니다."
+        )
+
     update_data = category_data.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
