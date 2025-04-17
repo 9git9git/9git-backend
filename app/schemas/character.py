@@ -12,7 +12,6 @@ class CharacterCreate(BaseModel):
 class CharacterResponse(BaseModel):
     id: UUID
     character_name: str
-    level: int
     image_link: str
     created_at: datetime
     updated_at: datetime
