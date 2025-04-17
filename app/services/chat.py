@@ -43,8 +43,9 @@ async def select_chats_by_storage(
     db: AsyncSession,
     user_id: UUID,
     storage_id: UUID,
+    category_id: UUID,
 ) -> List[ChatResponse]:
-    return await read_chats_by_storage(db, user_id, storage_id)
+    return await read_chats_by_storage(db, user_id, storage_id, category_id)
 
 
 # category_id 기준 조회

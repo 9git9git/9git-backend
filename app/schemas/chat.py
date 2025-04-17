@@ -19,6 +19,7 @@ class ChatResponse(BaseModel):
     category_id: UUID
     role: RoleEnum
     content: str
+    created_at: datetime
 
 
 class ModelResponse(BaseModel):

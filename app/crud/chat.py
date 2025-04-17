@@ -110,9 +110,14 @@ async def read_chats_by_storage(
     db: AsyncSession,
     user_id: UUID,
     storage_id: UUID,
+    category_id: UUID,
 ) -> List[ChatResponse]:
     result = await db.execute(
-        select(Chat).where(Chat.user_id == user_id, Chat.storage_id == storage_id)
+        select(Chat).where(
+            Chat.user_id == user_id,
+            Chat.storage_id == storage_id,
+            Chat.category_id == category_id,
+        )
     )
     return result.scalars().all()
 

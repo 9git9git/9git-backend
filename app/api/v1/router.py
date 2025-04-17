@@ -56,7 +56,7 @@ router.include_router(
 )
 router.include_router(
     chat.router,
-    prefix="/users/{user_id}/categories/{category_id}/chats",
+    prefix="/users/{user_id}/categories/{category_id}/storages/{storage_id}/chats",
     tags=["chats"],
 )
 router.include_router(

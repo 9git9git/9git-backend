@@ -19,7 +19,7 @@ from app.services.chat import (
 router = APIRouter()
 
 
-@router.get("/", response_model=ResponseBase[List[ChatResponse]])
+@router.get("/all", response_model=ResponseBase[List[ChatResponse]])
 async def get_chats_by_user(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
@@ -35,31 +35,16 @@ async def get_chats_by_user(
         )
 
 
-@router.get("/storage/{storage_id}", response_model=ResponseBase[List[ChatResponse]])
-async def get_chats_by_storage(
+@router.get("/", response_model=ResponseBase[List[ChatResponse]])
+async def get_chats_by_storage_and_category(
     user_id: UUID,
     storage_id: UUID,
-    db: AsyncSession = Depends(get_db),
-) -> ResponseBase[List[ChatResponse]]:
-    try:
-        chats = await select_chats_by_storage(db, user_id, storage_id)
-        return ResponseBase(status_code=status.HTTP_200_OK, data=chats)
-    except HTTPException as e:
-        return ResponseBase(status_code=e.status_code, error=e.detail)
-    except Exception as e:
-        return ResponseBase(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(e)
-        )
-
-
-@router.get("/", response_model=ResponseBase[List[ChatResponse]])
-async def get_chats_by_category(
-    user_id: UUID,
     category_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[List[ChatResponse]]:
     try:
-        chats = await select_chats_by_category(db, user_id, category_id)
+        # 스토리지 ID 기준으로 조회 (storage_id가 URL 접두사에 이미 포함되어 있음)
+        chats = await select_chats_by_storage(db, user_id, storage_id, category_id)
         return ResponseBase(status_code=status.HTTP_200_OK, data=chats)
     except HTTPException as e:
         return ResponseBase(status_code=e.status_code, error=e.detail)
