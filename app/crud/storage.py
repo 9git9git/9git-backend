@@ -8,12 +8,21 @@ from sqlalchemy.orm import selectinload
 
 
 async def create_storage(
-    db: AsyncSession, user_id: UUID, category_id: UUID, storage_data: StorageCreate
+    db: AsyncSession,
+    user_id: UUID,
+    category_id: UUID,
+    storage_data: StorageCreate,
 ) -> StorageResponse:
+    title = (
+        storage_data.title
+        or f"[{storage_data.created_at.strftime('%Y-%m-%d')}] New Chat"
+    )
+
     db_storage = Storage(
         user_id=user_id,
         category_id=category_id,
-        title=storage_data.title,
+        title=title,
+        created_at=storage_data.created_at,
     )
 
     db.add(db_storage)

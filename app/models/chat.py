@@ -29,7 +29,7 @@ class Chat(Base):
         "app.models.chat.Storage", back_populates="chats"
     )
     category: Mapped[Optional["app.models.category.Category"]] = relationship(
-        "app.models.category.Category"
+        "app.models.category.Category", back_populates="chats"
     )
 
 

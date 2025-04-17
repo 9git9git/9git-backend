@@ -2,11 +2,13 @@ from typing import List
 from uuid import UUID
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.utils.chat_model_selector import route_to_model
+from app.models.chat import RoleEnum
 from app.schemas.chat import (
     ChatCreate,
     ChatUpdate,
     ChatResponse,
+    ChatWithModelResponse,
 )
 from app.crud.chat import (
     read_chat,
@@ -61,7 +63,7 @@ async def add_chat(
     storage_id: UUID,
     category_id: UUID,
     chat_data: ChatCreate,
-) -> ChatResponse:
+) -> ChatWithModelResponse:
     return await create_chat(db, user_id, storage_id, category_id, chat_data)
 
 

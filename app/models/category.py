@@ -37,6 +37,11 @@ class Category(Base):
         back_populates="category",
         cascade="all, delete",
     )
+    chats: Mapped[Optional[List["app.models.chat.Chat"]]] = relationship(
+        "app.models.chat.Chat",
+        back_populates="category",
+        cascade="all, delete",
+    )
 
 
 # ✅ Progress 테이블: 카테고리별 목표 진행률 저장 테이블
