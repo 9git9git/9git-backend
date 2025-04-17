@@ -100,7 +100,7 @@ async def delete_character(
 # 서비스 로직
 
 
-@router.get("/characters", response_model=ResponseBase[List[CharacterResponse]])
+@router.get("/", response_model=ResponseBase[List[CharacterResponse]])
 async def get_user_character_collection(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),

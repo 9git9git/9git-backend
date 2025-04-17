@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     todo,
     main,
     analyze,
+    chart,
 )
 
 router = APIRouter()
@@ -69,17 +70,18 @@ router.include_router(
 )
 router.include_router(main.router, prefix="/users/{user_id}", tags=["main"])
 
-# 일반 캐릭터 CRUD
-router.include_router(character.router, prefix="/characters", tags=["characters"])
-
 # 유저 도감 전용 API (GET /users/{user_id}/characters)
 router.include_router(
-    character.router,
-    prefix="/users/{user_id}",
-    tags=["user_characters"],  # or "characters" if you want to group together
+    character.router, prefix="/users/{user_id}/characters", tags=["characters"]
 )
 router.include_router(
     analyze.router,
     prefix="/users/{user_id}/analyze",
     tags=["analyze"],
+)
+
+router.include_router(
+    chart.router,
+    prefix="/users/{user_id}",
+    tags=["Chart"],
 )
