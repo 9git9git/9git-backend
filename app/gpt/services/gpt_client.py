@@ -1,4 +1,4 @@
-# services/gpt_client.py
+# services/gpt_client.py - Azure OpenAI
 
 import os
 import requests
@@ -35,13 +35,22 @@ def get_model_config(category: CategoryNameEnum) -> tuple[str, str]:
 def call_gpt(
     messages, category: CategoryNameEnum, temperature=0.7, max_tokens=1000
 ) -> str:
+    """
+    GPT 모델에 메시지 리스트를 전달하여 응답을 받아옵니다.
+    - messages: 시스템/사용자 대화 이력 (list of dict)
+    - temperature: 창의성 조절 파라미터 (기본 0.7)
+    - max_tokens: 최대 토큰 수 (기본 1000)
+    """
+
     endpoint, deployment = get_model_config(category)
 
     url = f"{endpoint}/openai/deployments/{deployment}/chat/completions?api-version={api_version}"
     print(f"📡 호출 URL: {url}")
     headers = {"Content-Type": "application/json", "api-key": api_key}
+
+    # GPT API 요청 페이로드 구성
     payload = {
-        "messages": messages,
+        "messages": messages,  # 메시지 리스트
         "temperature": temperature,
         "top_p": 0.95,
         "max_tokens": max_tokens,
@@ -56,6 +65,8 @@ def call_gpt(
             print("❌ GPT 응답 파싱 오류:", e)
             print("📨 응답 원문:", response.json())
             raise
+
+    # 실패한 경우 상세 로그 출력 후 예외 발생
     else:
         print(f"❌ GPT 호출 실패 {response.status_code}")
         print("📤 요청:", messages)
