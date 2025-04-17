@@ -11,7 +11,6 @@ async def create_character(
 ) -> Character:
     db_character = Character(
         character_name=character_data.character_name,
-        level=character_data.level,
         image_link=character_data.image_link,
     )
 

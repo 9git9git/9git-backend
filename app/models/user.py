@@ -105,7 +105,6 @@ class Character(Base):
     __tablename__ = "characters"
 
     character_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    level: Mapped[int] = mapped_column(Integer, nullable=False)
     image_link: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # 관계: Character 1 : N UserCharacter (사용자가 보유한 캐릭터 목록)
