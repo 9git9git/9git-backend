@@ -7,3 +7,4 @@ from typing import List
 class TodosAndMemosResponse(BaseModel):
     todos: List[TodoResponse]
     memos: List[MemoResponse]
+    cheerUpMessage: str
