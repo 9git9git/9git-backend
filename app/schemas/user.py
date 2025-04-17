@@ -16,7 +16,7 @@ class UserResponse(BaseModel):
     id: UUID
     email: EmailStr
     name: str
-    sex: Optional[str] = None
+    sex: Optional[GenderEnum] = None
     age: Optional[int] = None
     job: Optional[str] = None
     level: Optional[int] = 1
@@ -27,9 +27,9 @@ class UserResponse(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    sex: GenderEnum
-    age: int
-    job: str
-    level: int
-    exp: int
-    character_count: int
+    sex: Optional[GenderEnum] = None
+    age: Optional[int] = None
+    job: Optional[str] = None
+    level: Optional[int] = 1
+    exp: Optional[int] = 0
+    character_count: Optional[int] = 0
