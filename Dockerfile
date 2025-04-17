@@ -7,6 +7,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt update && apt install -y \
     build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install poetry
@@ -26,6 +27,11 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Install system dependencies for psycopg2
+RUN apt update && apt install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy installed packages from builder
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
@@ -41,4 +47,4 @@ ENV BUILD_DATE=$BUILD_DATE
 EXPOSE 8000
 
 # Command to run the application with --reload option for development
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app"] 

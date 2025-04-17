@@ -29,6 +29,9 @@ app = FastAPI(
     version="0.0.1",
     debug=settings.DB_ECHO_LOG,
     lifespan=lifespan,
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 allow_origins = [
