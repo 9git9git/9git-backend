@@ -5,21 +5,19 @@ from uuid import uuid4
 from datetime import datetime, timezone
 
 from app.gpt.services.gpt_client import call_gpt
-from app.gpt.services.ai_search import (
-    upload_to_index,
-)  # 향후 exercisenoticeindex로 확장 예정
+from app.gpt.services.ai_search import upload_to_index, search_notice
 from app.gpt.utils.prompts_loader import load_combined_prompt, format_prompt
 from app.enum.category import CategoryNameEnum
 
 
 # ✅ 운동 튜터 전용 핸들러
 def handle_exercise_tutor(user_input: str) -> str:
-    category = CategoryNameEnum.EXERCISE.name
+    category = CategoryNameEnum.EXERCISE
     index_name = os.getenv("AZURE_SEARCH_INDEX_EXERCISE")
     question = user_input.strip()
 
     # 🔹 Notice 기반 RAG 검색 (향후 exercisenoticeindex 연동 예정)
-    rag_context = ""  # 현재는 빈 문자열
+    rag_context = search_notice(query=question, category_enum=category)
 
     # 🔹 프롬프트 로딩 및 메시지 구성
     system_prompt, user_template = load_combined_prompt(category)
@@ -46,9 +44,9 @@ def handle_exercise_tutor(user_input: str) -> str:
     upload_to_index(
         index_name,
         {
-            "id": f"{category}-{str(uuid4())}",
+            "id": f"{category.name}-{str(uuid4())}",
             "mode": "summary",
-            "category": category,
+            "category": category.name,
             "original": question,
             "summary": summary,
             "created_at": datetime.now(timezone.utc).isoformat(),

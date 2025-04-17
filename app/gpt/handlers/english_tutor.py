@@ -12,20 +12,18 @@ from app.enum.category import CategoryNameEnum
 
 # ✅ 영어 튜터 전용 핸들러
 def handle_english_tutor(user_input: str) -> str:
-    category = CategoryNameEnum.ENGLISH.name
+    category = CategoryNameEnum.ENGLISH
     index_name = os.getenv("AZURE_SEARCH_INDEX_ENGLISH")
 
     # 1. 사용자 입력 수신
     question = user_input.strip()
 
     # 2. Notice 인덱스에서 관련 정보 검색 (시험 정보 등)
-    rag_context = search_notice(query=question, category=category)
+    rag_context = search_notice(query=question, category_enum=category)
     print("🧾 검색 결과 (RAG):", rag_context)
     # 3. 프롬프트 로딩 및 메시지 생성
     system_prompt, user_template = load_combined_prompt(category)
-    user_message = format_prompt(
-        template=user_template, context=rag_context, question=question
-    )
+    user_message = format_prompt(user_template, rag_context, question)
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -48,9 +46,9 @@ def handle_english_tutor(user_input: str) -> str:
     upload_to_index(
         index_name,
         {
-            "id": f"{category}-{str(uuid4())}",
+            "id": f"{category.name}-{str(uuid4())}",
             "mode": "summary",
-            "category": category,
+            "category": category.name,
             "original": question,
             "summary": summary,
             "created_at": datetime.now(timezone.utc).isoformat(),

@@ -13,7 +13,7 @@ def load_combined_prompt(category_enum: CategoryNameEnum) -> tuple[str, str]:
     반환 형식: (system_prompt, user_template)
     """
     filename = category_enum.name + ".txt"  # CODING.txt
-    prompt_path = f"prompts/{filename}"
+    prompt_path = f"app/gpt/prompts/{filename}"
 
     if not os.path.exists(prompt_path):
         raise FileNotFoundError(f"❌ 프롬프트 파일이 없습니다: {prompt_path}")

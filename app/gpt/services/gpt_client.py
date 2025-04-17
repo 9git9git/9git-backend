@@ -33,7 +33,7 @@ def get_model_config(category: CategoryNameEnum) -> tuple[str, str]:
 
 # ✅ GPT 호출
 def call_gpt(
-    messages, category=CategoryNameEnum, temperature=0.7, max_tokens=1000
+    messages, category: CategoryNameEnum, temperature=0.7, max_tokens=1000
 ) -> str:
     endpoint, deployment = get_model_config(category)
 

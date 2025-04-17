@@ -17,16 +17,16 @@ admin_key = os.getenv("AZURE_SEARCH_ADMIN_KEY")
 HEADERS = {"Content-Type": "application/json", "api-key": admin_key}
 
 
-def get_notice_index(category: str) -> str:
+def get_notice_index(category_enum: CategoryNameEnum) -> str:
     return {
         CategoryNameEnum.ENGLISH.name: os.getenv("AZURE_SEARCH_INDEX_NOTICE_ENGLISH"),
         CategoryNameEnum.CODING.name: os.getenv("AZURE_SEARCH_INDEX_NOTICE_CODING"),
         CategoryNameEnum.EXERCISE.name: os.getenv("AZURE_SEARCH_INDEX_NOTICE_EXERCISE"),
-    }.get(category)
+    }.get(category_enum.name)
 
 
-def search_notice(query: str, category: str, top_k: int = 3) -> str:
-    index = get_notice_index(category)
+def search_notice(query: str, category_enum: CategoryNameEnum, top_k: int = 3) -> str:
+    index = get_notice_index(category_enum)
     if not index:
         return ""
 
