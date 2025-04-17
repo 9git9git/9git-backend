@@ -12,7 +12,7 @@ from app.enum.category import CategoryNameEnum
 
 # ✅ 코딩 튜터 전용 핸들러
 def handle_coding_tutor(user_input: str) -> str:
-    category = CategoryNameEnum.CODING.value
+    category = CategoryNameEnum.CODING.name
     index_name = os.getenv("AZURE_SEARCH_INDEX_CODING")
     question = user_input.strip()
 

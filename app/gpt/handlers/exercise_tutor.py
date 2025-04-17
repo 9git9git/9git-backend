@@ -14,7 +14,7 @@ from app.enum.category import CategoryNameEnum
 
 # ✅ 운동 튜터 전용 핸들러
 def handle_exercise_tutor(user_input: str) -> str:
-    category = CategoryNameEnum.EXERCISE.value
+    category = CategoryNameEnum.EXERCISE.name
     index_name = os.getenv("AZURE_SEARCH_INDEX_EXERCISE")
     question = user_input.strip()
 

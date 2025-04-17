@@ -70,8 +70,8 @@ async def update_category(
 
 
 # 카테고리 삭제
-async def delete_category(db: AsyncSession, db_category: Category) -> bool:
-    delete_stmt = delete(Category).where(Category.id == db_category.id)
+async def delete_category(db: AsyncSession, category_id: UUID) -> bool:
+    delete_stmt = delete(Category).where(Category.id == category_id)
     try:
         await db.execute(delete_stmt)
         await db.commit()

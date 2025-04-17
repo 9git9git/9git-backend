@@ -1,6 +1,6 @@
 from uuid import UUID
 from typing import List
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, text
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.chat import Chat
@@ -16,6 +16,7 @@ from app.enum.chat import RoleEnum
 from app.utils.to_snake_case import camel_to_snake
 from app.utils.chat_model_selector import route_to_model
 from app.enum.category import CategoryNameEnum
+from app.models.category import Category
 
 
 # 생성
@@ -27,7 +28,7 @@ async def create_chat(
     chat_data: ChatCreate,
 ) -> ChatWithModelResponse:
 
-    user_chat = Chat(  # 사용자 질문 저장
+    user_chat = Chat(
         user_id=user_id,
         storage_id=storage_id,
         category_id=category_id,
@@ -38,18 +39,30 @@ async def create_chat(
     await db.commit()
     await db.refresh(user_chat)
 
-    chat_with_category = await db.execute(
-        select(Chat).options(joinedload(Chat.category)).where(Chat.id == user_chat.id)
+    # ✅ 카테고리 이름 직접 SQL로 조회 (ENUM)
+    result = await db.execute(
+        text(
+            """
+        SELECT category_name
+        FROM categories
+        WHERE id = :category_id
+        """
+        ),
+        {"category_id": str(category_id)},
     )
-    chat_with_category = chat_with_category.scalars().first()
+    row = result.first()
 
+    if row is None:
+        raise ValueError("❌ 해당 category_id에 대한 카테고리를 찾을 수 없습니다.")
+
+    category_enum = CategoryNameEnum[row.category_name]
+
+    # ✅ GPT 호출
     if chat_data.role == RoleEnum.USER:
-        category_enum = CategoryNameEnum(chat_with_category.category.category_name)
-
         model_func = route_to_model(category_enum)
         gpt_response = model_func(chat_data.content)
 
-        assistant_chat = Chat(  # assistant 응답 저장
+        assistant_chat = Chat(
             user_id=user_id,
             storage_id=storage_id,
             category_id=category_id,
@@ -64,7 +77,7 @@ async def create_chat(
             chat=user_chat, model_response=ModelResponse(content=gpt_response)
         )
 
-    # assistant 응답이 아닌 경우 (예외적으로)
+    # assistant role이 아닌 경우
     return ChatWithModelResponse(
         chat=user_chat, model_response=ModelResponse(content="")
     )

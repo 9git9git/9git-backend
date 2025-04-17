@@ -7,7 +7,13 @@ from app.enum.category import CategoryNameEnum
 
 
 def handle_tutor(user_input: str, category: str) -> str:
-    category_enum = CategoryNameEnum[category.upper()]
+    """
+    category: CategoryNameEnum.name 문자열 ("ENGLISH", "CODING", "EXERCISE")
+    """
+    try:
+        category_enum = CategoryNameEnum[category.upper()]
+    except KeyError:
+        raise ValueError(f"[❌] 잘못된 카테고리 이름: {category}")
 
     if category_enum == CategoryNameEnum.ENGLISH:
         return handle_english_tutor(user_input)
@@ -16,15 +22,4 @@ def handle_tutor(user_input: str, category: str) -> str:
     elif category_enum == CategoryNameEnum.EXERCISE:
         return handle_exercise_tutor(user_input)
     else:
-        raise ValueError(f"[❌] 지원하지 않는 category: {category}")
-
-
-def handle_tutor(user_input: str, category: str) -> str:
-    if category == CategoryNameEnum.ENGLISH.value:
-        return handle_english_tutor(user_input)
-    elif category == CategoryNameEnum.CODING.value:
-        return handle_coding_tutor(user_input)
-    elif category == CategoryNameEnum.EXERCISE.value:
-        return handle_exercise_tutor(user_input)
-    else:
-        raise ValueError(f"[❌] 지원하지 않는 category: {category}")
+        raise ValueError(f"[❌] 지원하지 않는 category: {category_enum}")

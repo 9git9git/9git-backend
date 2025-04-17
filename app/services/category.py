@@ -78,5 +78,6 @@ async def delete_category_by_id(db: AsyncSession, category_id: UUID) -> bool:
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="데이터베이스 오류가 발생했습니다.",
+            # detail="데이터베이스 오류가 발생했습니다.",
+            detail=str(e),
         ) from e

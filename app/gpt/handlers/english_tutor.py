@@ -12,7 +12,7 @@ from app.enum.category import CategoryNameEnum
 
 # ✅ 영어 튜터 전용 핸들러
 def handle_english_tutor(user_input: str) -> str:
-    category = CategoryNameEnum.ENGLISH.value
+    category = CategoryNameEnum.ENGLISH.name
     index_name = os.getenv("AZURE_SEARCH_INDEX_ENGLISH")
 
     # 1. 사용자 입력 수신

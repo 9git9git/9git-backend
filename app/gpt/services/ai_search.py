@@ -19,11 +19,9 @@ HEADERS = {"Content-Type": "application/json", "api-key": admin_key}
 
 def get_notice_index(category: str) -> str:
     return {
-        CategoryNameEnum.ENGLISH.value: os.getenv("AZURE_SEARCH_INDEX_NOTICE_ENGLISH"),
-        CategoryNameEnum.CODING.value: os.getenv("AZURE_SEARCH_INDEX_NOTICE_CODING"),
-        CategoryNameEnum.EXERCISE.value: os.getenv(
-            "AZURE_SEARCH_INDEX_NOTICE_EXERCISE"
-        ),
+        CategoryNameEnum.ENGLISH.name: os.getenv("AZURE_SEARCH_INDEX_NOTICE_ENGLISH"),
+        CategoryNameEnum.CODING.name: os.getenv("AZURE_SEARCH_INDEX_NOTICE_CODING"),
+        CategoryNameEnum.EXERCISE.name: os.getenv("AZURE_SEARCH_INDEX_NOTICE_EXERCISE"),
     }.get(category)
 
 
