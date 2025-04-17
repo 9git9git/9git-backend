@@ -27,7 +27,7 @@ async def get_goal_challenges_analysis(user_id: str):
     모든 목표에 대한 도전과제 추천을 가져옵니다.
     """
     challenges = {}
-    for goal in ["영어", "코딩", "운동"]:
+    for goal in ["운동", "영어", "코딩"]:
         challenge_result = await get_goal_challenges(user_id, goal)
         challenges[goal] = challenge_result
 
