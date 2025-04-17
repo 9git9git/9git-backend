@@ -33,8 +33,12 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY . .
 
+# Set build time argument
+ARG BUILD_DATE
+ENV BUILD_DATE=$BUILD_DATE
+
 # Expose port
 EXPOSE 8000
 
-# Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Command to run the application with --reload option for development
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 

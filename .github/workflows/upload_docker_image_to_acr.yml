@@ -15,6 +15,10 @@ jobs:
       # 1. 소스 코드 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 모든 히스토리 가져오기
+          ref: ${{ github.ref }}  # 현재 브랜치의 최신 커밋 사용
+          clean: true  # 작업 디렉토리 정리
 
       # 2. Azure 로그인 (Service Principal 사용)
       - name: Log in to Azure
@@ -52,6 +56,9 @@ jobs:
           push: true # 빌드 후 푸시 실행
           tags: ${{ steps.meta.outputs.tags }} # 위 metadata step에서 생성된 태그 사용
           labels: ${{ steps.meta.outputs.labels }} # 위 metadata step에서 생성된 라벨 사용
+          no-cache: true  # 캐시 비활성화
+          build-args: |
+            BUILD_DATE=$(date +%Y%m%d%H%M%S)  # 빌드 시간을 인자로 전달
 
       # 6. ACR에 푸시된 이미지 확인
       - name: Verify pushed image
