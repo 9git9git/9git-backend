@@ -8,6 +8,7 @@ from app.services.character import (
     delete_character_by_id,
     update_character_by_id,
     get_character_collection,
+    register_user_character,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
@@ -33,7 +34,7 @@ async def post_character(
         )
 
 
-@router.get("/", response_model=ResponseBase[List[CharacterResponse]])
+@router.get("/all", response_model=ResponseBase[List[CharacterResponse]])
 async def get_characters(
     db: AsyncSession = Depends(get_db),
 ) -> ResponseBase[List[CharacterResponse]]:
@@ -98,6 +99,14 @@ async def delete_character(
 
 
 # 서비스 로직
+@router.post("/collect")
+async def collect_character_for_user(
+    user_id: UUID,
+    character_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    await register_user_character(db, user_id, character_id)
+    return {"message": "수집 완료!"}
 
 
 @router.get("/", response_model=ResponseBase[List[CharacterResponse]])

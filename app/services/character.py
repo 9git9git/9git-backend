@@ -79,6 +79,22 @@ async def delete_character_by_id(db: AsyncSession, character_id: UUID) -> bool:
 
 
 # 서비스 로직
+from app.models.user import UserCharacter
+from uuid import uuid4
+from datetime import datetime
+
+
+async def register_user_character(
+    db: AsyncSession, user_id: UUID, character_id: UUID
+) -> None:
+    user_character = UserCharacter(
+        id=uuid4(),
+        user_id=user_id,
+        character_id=character_id,
+        collected_at=datetime.utcnow(),
+    )
+    db.add(user_character)
+    await db.commit()
 
 
 async def get_character_collection(
