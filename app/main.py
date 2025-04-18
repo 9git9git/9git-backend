@@ -37,6 +37,7 @@ app = FastAPI(
 allow_origins = [
     "http://localhost:3000",
     "https://gugit-frontend-test-aca.calmforest-521dd431.eastus.azurecontainerapps.io",
+    "https://9git-frontend.vercel.app",
     # TODO: 추후 프론트 배포 url 추가 필요
 ]
 app.add_middleware(
