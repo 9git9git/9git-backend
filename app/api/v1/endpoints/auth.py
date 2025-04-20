@@ -44,7 +44,7 @@ async def login(
             httponly=True,  # JavaScript에서 접근 불가능
             max_age=60 * 60 * 24,  # 1일 (초 단위)
             expires=60 * 60 * 24,  # 1일 (초 단위)
-            samesite="lax",  # CSRF 보호
+            samesite="none",  # CSRF 보호
             secure=settings.IS_SECURE,  # HTTPS에서만 전송 (프로덕션에서는 True로 설정)
         )
 
