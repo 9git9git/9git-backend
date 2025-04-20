@@ -45,7 +45,7 @@ async def login(
             max_age=60 * 60 * 24,  # 1일 (초 단위)
             expires=60 * 60 * 24,  # 1일 (초 단위)
             samesite="none",  # CSRF 보호
-            secure=settings.IS_SECURE,  # HTTPS에서만 전송 (프로덕션에서는 True로 설정)
+            secure=True,  # HTTPS에서만 전송 (프로덕션에서는 True로 설정)
         )
 
         return ResponseBase(status_code=status.HTTP_200_OK, data=login_response)
